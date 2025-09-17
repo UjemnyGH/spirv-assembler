@@ -1,0 +1,70 @@
+#version 460
+
+layout(local_size_x = 1) in;
+
+// Uniform block
+layout(set = 0, binding = 0) uniform Camera {
+    mat4 view;
+    mat4 proj;
+};
+
+// Storage buffer
+layout(set = 0, binding = 1) buffer DataBuffer {
+    float values[16];
+};
+
+// Sampler
+layout(set = 0, binding = 2) uniform sampler2D tex;
+
+// Struct and array
+struct Light {
+    vec3 color;
+    vec3 direction;
+    float intensity;
+};
+Light lights[2];
+
+// Function with parameters and return
+vec3 computeLight(vec3 pos, Light l) {
+    vec3 dir = normalize(l.direction - pos);
+    return dir * l.intensity * l.color;
+}
+
+// Main function
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+
+    // Scalars
+    int a = 1;
+    float b = 2.5;
+    bool flag = true;
+
+    // Vectors and matrices
+    vec2 v2 = vec2(a, b);
+    vec3 v3 = vec3(a, b, 0.0);
+    vec4 v4 = vec4(a, b, 0.0, 1.0);
+    mat2 m2 = mat2(1.0);
+    mat3 m3 = mat3(1.0);
+    mat4 m4 = mat4(1.0);
+
+    // Array access
+    values[idx] = v3.x + float(a);
+
+    // Struct and function call
+    vec3 lighting = computeLight(v3, lights[0]);
+
+    // Branching
+    if(flag) {
+        values[idx] += lighting.x;
+    } else {
+        values[idx] -= lighting.y;
+    }
+
+    // Loop
+    for(int i=0; i<2; i++) {
+        values[idx] += lights[i].intensity;
+    }
+
+    // Texture lookup
+    vec4 texColor = texture(tex, v2);
+}

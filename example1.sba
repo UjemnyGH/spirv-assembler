@@ -1,0 +1,32 @@
+glsl = import GLSL.std.450
+
+; Types
+void = type VOID
+b8 = type BOOL 8
+i32 = type INT 32
+f32 = type FLOAT 32
+v4f = type VECTOR f32 4
+mat4 = type MATRIX v4f 4 
+; depth = 0, arrayed = 0, ms = 0, sampler 1, format = RGBA8SNORM
+imagef = type IMAGE f32 2D D0 A0 MS0 S1 RGBA8SNORM
+sampled = type SAMPLED_IMAGE imagef
+
+; Variables
+texture = uniform sampled
+inPos  = input v4f
+outCol = output v4f
+
+decorate inPos L0
+decorate outCol L1
+
+test = fn v4f someParameter v4f
+
+endfn
+
+; Main function
+main = fn void
+    outCol = inPos
+    @test
+    @glsl.Normalize inPos
+    ret
+endfn
