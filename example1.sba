@@ -1,3 +1,5 @@
+module example.1
+
 glsl = import GLSL.std.450
 
 ; Types
@@ -15,18 +17,19 @@ sampled = type SAMPLED_IMAGE imagef
 texture = uniform sampled
 inPos  = input v4f
 outCol = output v4f
+variable = var v4f
 
 decorate inPos L0
 decorate outCol L1
 
-test = fn v4f someParameter v4f
-
+test = fn v4f(someParameter v4f)
+; Function
 endfn
 
-; Main function
+; Main function, no params here so no need for '()'
 main = fn void
-    outCol = inPos
-    @test
-    @glsl.Normalize inPos
-    ret
+  outCol = inPos
+  @test()
+  @glsl.Normalize(inPos)
+  ret
 endfn

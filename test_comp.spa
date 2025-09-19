@@ -1,0 +1,79 @@
+ExtInstImport %%glsl GLSL.std.450
+
+EntryPoint Compute %main main
+
+ExecutionMode %main LocalSize 1 1 1
+
+; Unsigned int def
+TypeInt %u32T 32 0
+; unsigned vec3 def
+TypeVector %v3uT %u32T 3
+; unsigned vec3 decl
+TypePointer %v3u Input %v3uT
+; var decl
+Variable %GlobalInvocationId %v3i Input
+; var as built-in
+Decorate %GlobalInvocationId Builtin GlobalInvocationId
+
+; Void def
+TypeVoid %voidT
+; Fn def with ret void
+TypeFunction %fn_voidT %voidT 
+
+; fn decl
+Function %main None %fn_voidT
+
+FunctionEnd
+
+; Float 32 def
+TypeFloat %f32T 32
+; Vector3 def
+TypeVector %v3fT %f32T 3
+TypePointer %v3f Function %v3fT
+
+TypeStruct %lightInfoST %v3fT %v3fT %f32T
+MemberName %lightInfoST 0 color
+MemberName %lightInfoST 1 direction
+MemberName %lightInfoST 2 intensity
+TypePointer %lightInfoS Function %lightInfoST
+
+TypeFunction %fn_compLightT %v3fT %v3f %lightInfoS
+
+Function %computeLight None %fn_compLightT
+FunctionParameter %position %v3f
+FunctionParameter %lightInfo %lightInfoS
+
+; Empty or double does not create name
+Label %
+
+Variable %direction %v3f Function
+
+TypeInt %i32T 32 1
+Constant %%1 %i32T 1
+
+AccessChain %v3f %%accessDirection %lightInfo %%1
+
+Load %v3fT %%directionS %%accessDirection
+Load %v3fT %%position %position
+
+FSub %v3fT %%fsub %%directionS %%position
+
+ExtInst %v3fT %%normalizeResult %%glsl Normalize %%fsub
+
+Store %direction %%normalizeResult
+Load %v3fT %%direction2 %direction
+
+TypePointer %f32 Function %f32T
+Constant %%2 %i32T 2
+AccessChain %f32 %%accessIntensity %lightInfo %%2
+Load %f32T %%intensity %%accessIntensity
+VectorTimesScalar %v3fT %%dirIntensity %%direction2 %%intensity
+
+Constant %%0 %i32T 0
+AccessChain %v3f %%accessColor %lightInfo %%0
+Load %v3fT %%color %%accessColor
+FMul %v3fT %%mulColor %%dirIntensity %%color
+
+ReturnValue %%mulColor
+
+FunctionEnd
