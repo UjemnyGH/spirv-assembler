@@ -87,364 +87,354 @@ typedef sa_int8_t     sa_bool;
 #define sa_ptr32(x) ((sa_uint32_t*)x)
 #define sa_ptr64(x) ((sa_uint64_t*)x)
 
-// OpSource = Unknown, We dont have source such as GLSL, etc.
-#define SA_SHADER_SOURCE 0
+#define SA_DEFAULT_MEMORY_ADDRESSING_MODEL saAddresingModel_Logical
+#define SA_DEFAULT_MEMORY_MODEL saMemoryModel_Vulkan
 
-// Used by OpCapability
-// XXX: For now there are only needed capabilities
-enum sa__OpCapability {
-  // Basically useless, because it is defined with Shader capability
-  saOpCapability_Matrix = 0,
-  // Used by vertex, fragment and compute shaders
-  saOpCapability_Shader = 1,
-  saOpCapability_Geometry = 2,
-  saOpCapability_Tesselation = 3,
-  // TODO: Add all of capabilities
-};
+#define SA_MAX_ENUMERANT_ENTRIES 128
 
 // Used by OpEntryPoint
-enum sa__OpEntryPoint {
-  saOpEntryPoint_Vertex = 0,
-  saOpEntryPoint_TessellationControl = 1,
-  saOpEntryPoint_TessellationEvaluation = 2,
-  saOpEntryPoint_Geometry = 3,
-  saOpEntryPoint_Fragment = 4,
-  saOpEntryPoint_GLCompute = 5,
+enum sa__EntryPoint_e {
+  saEntryPoint_Vertex = 0,
+  saEntryPoint_TessellationControl = 1,
+  saEntryPoint_TessellationEvaluation = 2,
+  saEntryPoint_Geometry = 3,
+  saEntryPoint_Fragment = 4,
+  saEntryPoint_GLCompute = 5,
   // XXX: everything below is currently unused
-  saOpEntryPoint_Kernel = 6,
-  saOpEntryPoint_TaskNV = 5267,
-  saOpEntryPoint_MeshNV = 5268,
-  saOpEntryPoint_RayGenerationKHR = 5313,
-  saOpEntryPoint_IntersectionKHR = 5314,
-  saOpEntryPoint_AnyHitKHR = 5315,
-  saOpEntryPoint_ClosestHitKHR = 5316,
-  saOpEntryPoint_MissKHR = 5317,
-  saOpEntryPoint_CallableKHR = 5318,
-  saOpEntryPoint_TaskEXT = 5364,
-  saOpEntryPoint_MeshEXT = 5365,
+  saEntryPoint_Kernel = 6,
+  saEntryPoint_TaskNV = 5267,
+  saEntryPoint_MeshNV = 5268,
+  saEntryPoint_RayGenerationKHR = 5313,
+  saEntryPoint_IntersectionKHR = 5314,
+  saEntryPoint_AnyHitKHR = 5315,
+  saEntryPoint_ClosestHitKHR = 5316,
+  saEntryPoint_MissKHR = 5317,
+  saEntryPoint_CallableKHR = 5318,
+  saEntryPoint_TaskEXT = 5364,
+  saEntryPoint_MeshEXT = 5365,
 
   // Nvidia raytracing, same as Khronos
-  saOpEntryPoint_RayGenerationNV = saOpEntryPoint_RayGenerationKHR,
-  saOpEntryPoint_IntersectionNV = saOpEntryPoint_IntersectionKHR,
-  saOpEntryPoint_AnyHitNV = saOpEntryPoint_AnyHitKHR,
-  saOpEntryPoint_ClosestHitNV = saOpEntryPoint_ClosestHitKHR,
-  saOpEntryPoint_MissNV = saOpEntryPoint_MissKHR,
-  saOpEntryPoint_CallableNV = saOpEntryPoint_CallableKHR
+  saEntryPoint_RayGenerationNV = saEntryPoint_RayGenerationKHR,
+  saEntryPoint_IntersectionNV = saEntryPoint_IntersectionKHR,
+  saEntryPoint_AnyHitNV = saEntryPoint_AnyHitKHR,
+  saEntryPoint_ClosestHitNV = saEntryPoint_ClosestHitKHR,
+  saEntryPoint_MissNV = saEntryPoint_MissKHR,
+  saEntryPoint_CallableNV = saEntryPoint_CallableKHR
 };
 
 // Used by OpMemoryModel
-enum sa__OpAddressingModel {
-  saOpAddresingModel_Logical = 0,
-  saOpAddresingModel_Physical32 = 1,
-  saOpAddresingModel_Physical64 = 2,
-  saOpAddresingModel_PhysicalStorageBuffer64 = 5348,
-  saOpAddresingModel_PhysicalStorageBuffer64EXT = saOpAddresingModel_PhysicalStorageBuffer64
+enum sa__AddressingModel_e {
+  saAddresingModel_Logical = 0,
+  saAddresingModel_Physical32 = 1,
+  saAddresingModel_Physical64 = 2,
+  saAddresingModel_PhysicalStorageBuffer64 = 5348,
+  saAddresingModel_PhysicalStorageBuffer64EXT = saAddresingModel_PhysicalStorageBuffer64
 };
 
 // Used by OpMemoryModel
-enum sa__OpMemoryModel {
-  saOpMemoryModel_Simple = 0,
-  saOpMemoryModel_GLSL450 = 1,
-  saOpMemoryModel_OpenCL = 2,
-  saOpMemoryModel_Vulkan = 3,
-  saOpMemoryModel_VulkanKHR = saOpMemoryModel_Vulkan
+enum sa__MemoryModel_e {
+  saMemoryModel_Simple = 0,
+  saMemoryModel_GLSL450 = 1,
+  saMemoryModel_OpenCL = 2,
+  saMemoryModel_Vulkan = 3,
+  saMemoryModel_VulkanKHR = saMemoryModel_Vulkan
 };
 
 // Used by OpExecutionMode and OpExecutionModeId
-enum sa__OpExecutionMode {
-  saOpExecutionMode_Invocations = 0,
-  saOpExecutionMode_SpacingEqual = 1,
-  saOpExecutionMode_SpacingFractionalEven = 2,
-  saOpExecutionMode_SpacingFractionalOdd = 3,
-  saOpExecutionMode_VertexOrderCw = 4,
-  saOpExecutionMode_VertexOrderCcw = 5,
-  saOpExecutionMode_PixelCenterInteger = 6,
-  saOpExecutionMode_OriginUpperLeft = 7,
-  saOpExecutionMode_OriginLowerLeft = 8,
-  saOpExecutionMode_EarlyFragmentTests = 9,
-  saOpExecutionMode_PointMode = 10,
-  saOpExecutionMode_Xfb = 11,
-  saOpExecutionMode_DepthReplacing = 12,
-  saOpExecutionMode_DepthGreater = 14,
-  saOpExecutionMode_DepthLess = 15,
-  saOpExecutionMode_DepthUnchanged = 16,
-  saOpExecutionMode_LocalSize = 17,
-  saOpExecutionMode_LocalSizeHint = 18,
-  saOpExecutionMode_InputPoints = 19,
-  saOpExecutionMode_InputLines = 20,
-  saOpExecutionMode_InputLinesAdjacency = 21,
-  saOpExecutionMode_InputTriangles = 22,
-  saOpExecutionMode_InputTrianglesAdjacency = 23,
-  saOpExecutionMode_Quads = 24,
-  saOpExecutionMode_Isolines = 25,
-  saOpExecutionMode_OutputVertices = 26,
-  saOpExecutionMode_OutputPoints = 27,
-  saOpExecutionMode_OutputLineStrip = 28,
-  saOpExecutionMode_OutputTriangleStrip = 29,
-  saOpExecutionMode_VecTypeHint = 30,
-  saOpExecutionMode_ContractionOff = 31,
-  saOpExecutionMode_Initializer = 33,
-  saOpExecutionMode_Finalizer = 34,
-  saOpExecutionMode_SubgroupSize = 35,
-  saOpExecutionMode_SubgroupsPerWorkgroup = 36,
-  saOpExecutionMode_SubgroupsPerWorkgroupId = 37,
-  saOpExecutionMode_LocalSizeId = 38,
-  saOpExecutionMode_LocalSizeHintId = 39,
-  saOpExecutionMode_NonCoherentColorAttachmentReadEXT = 4169,
-  saOpExecutionMode_NonCoherentDepthAttachmentReadEXT = 4170,
-  saOpExecutionMode_NonCoherentStencilAttachmentReadEXT = 4171,
-  saOpExecutionMode_SubgroupUniformControlFlowKHR = 4421,
-  saOpExecutionMode_PostDepthCoverage = 4446,
-  saOpExecutionMode_DenormPreserve = 4459,
-  saOpExecutionMode_DenormFlushToZero = 4460,
-  saOpExecutionMode_SignedZeroInfNanPreserve = 4461,
-  saOpExecutionMode_RoundingModeRTE = 4462,
-  saOpExecutionMode_RoundingModeRTZ = 4463,
-  saOpExecutionMode_EarlyAndLateFragmentTestsAMD = 5017,
-  saOpExecutionMode_StencilRefReplacingEXT = 5027,
-  saOpExecutionMode_CoalesaingAMDX = 5069,
-  saOpExecutionMode_IsApiEntryAMDX = 5070,
-  saOpExecutionMode_MaxNodeRecursionAMDX = 5071,
-  saOpExecutionMode_StaticNumWorkgroupsAMDX = 5072,
-  saOpExecutionMode_ShaderIndexAMDX = 5073,
-  saOpExecutionMode_MaxNumWorkgroupsAMDX = 5077,
-  saOpExecutionMode_StencilRefUnchangedFrontAMD = 5079,
-  saOpExecutionMode_StencilRefGreaterFrontAMD = 5080,
-  saOpExecutionMode_StencilRefLessFrontAMD = 5081,
-  saOpExecutionMode_StencilRefUnchangedBackAMD = 5082,
-  saOpExecutionMode_StencilRefGreaterBackAMD = 5083,
-  saOpExecutionMode_StencilRefLessBackAMD = 5084,
-  saOpExecutionMode_QuadDerivativesKHR = 5088,
-  saOpExecutionMode_RequireFullQuadsKHR = 5089,
-  saOpExecutionMode_ShareInputWithAMDX = 5102,
-  saOpExecutionMode_OutputLinesEXT = 5269,
-  saOpExecutionMode_OutputPrimitivesEXT = 5270,
-  saOpExecutionMode_DerivativeGroupQuadsKHR = 5289,
-  saOpExecutionMode_DerivativeGroupLinearKHR = 5290,
-  saOpExecutionMode_OutputTrianglesEXT = 5298,
-  saOpExecutionMode_PixelInterlockOrderedEXT = 5366,
-  saOpExecutionMode_PixelInterlockUnorderedEXT = 5367,
-  saOpExecutionMode_SamplerInterlockOrderedEXT = 5368,
-  saOpExecutionMode_SamplerInterlockUnorderedEXT = 5369,
-  saOpExecutionMode_ShadingRateInterlockOrderedEXT = 5370,
-  saOpExecutionMode_ShadingRateInterlockUnorderedEXT = 5371,
-  saOpExecutionMode_SharedLocalMemorySizeINTEL = 5618,
-  saOpExecutionMode_RoundingModeRTPINTEL = 5620,
-  saOpExecutionMode_RoundingModeRTNINTEL = 5621,
-  saOpExecutionMode_FloatingPointModeALTINTEL = 5622,
-  saOpExecutionMode_FloatingPointModeIEEEINTEL = 5623,
-  saOpExecutionMode_MaxWorkgroupSizeINTEL = 5893,
-  saOpExecutionMode_MaxWorkDimIMTEL = 5894,
-  saOpExecutionMode_NoGlobalOffsetINTEL = 5895,
-  saOpExecutionMode_NumSIMDWorkitemsINTEL = 5896,
-  saOpExecutionMode_schedulerTargetFmaxMhzINTEL = 5903,
-  saOpExecutionMode_MaximallyReconvergesKHR = 6023,
-  saOpExecutionMode_FPFastMathDefault = 6028,
-  saOpExecutionMode_StreamingInterfaceINTEL = 6154,
-  saOpExecutionMode_RegisterMapInterfaceINTEL = 6160,
-  saOpExecutionMode_NamedBarrierCountINTEL = 6417,
-  saOpExecutionMode_MaximumRegistersINTEL = 6461,
-  saOpExecutionMode_MaximumRegistersIdINTEL = 6462,
-  saOpExecutionMode_NamedMaximumRegistersINTEL = 6463,
+enum sa__OpExecutionMode_e {
+  saExecutionMode_Invocations = 0,
+  saExecutionMode_SpacingEqual = 1,
+  saExecutionMode_SpacingFractionalEven = 2,
+  saExecutionMode_SpacingFractionalOdd = 3,
+  saExecutionMode_VertexOrderCw = 4,
+  saExecutionMode_VertexOrderCcw = 5,
+  saExecutionMode_PixelCenterInteger = 6,
+  saExecutionMode_OriginUpperLeft = 7,
+  saExecutionMode_OriginLowerLeft = 8,
+  saExecutionMode_EarlyFragmentTests = 9,
+  saExecutionMode_PointMode = 10,
+  saExecutionMode_Xfb = 11,
+  saExecutionMode_DepthReplacing = 12,
+  saExecutionMode_DepthGreater = 14,
+  saExecutionMode_DepthLess = 15,
+  saExecutionMode_DepthUnchanged = 16,
+  saExecutionMode_LocalSize = 17,
+  saExecutionMode_LocalSizeHint = 18,
+  saExecutionMode_InputPoints = 19,
+  saExecutionMode_InputLines = 20,
+  saExecutionMode_InputLinesAdjacency = 21,
+  saExecutionMode_InputTriangles = 22,
+  saExecutionMode_InputTrianglesAdjacency = 23,
+  saExecutionMode_Quads = 24,
+  saExecutionMode_Isolines = 25,
+  saExecutionMode_OutputVertices = 26,
+  saExecutionMode_OutputPoints = 27,
+  saExecutionMode_OutputLineStrip = 28,
+  saExecutionMode_OutputTriangleStrip = 29,
+  saExecutionMode_VecTypeHint = 30,
+  saExecutionMode_ContractionOff = 31,
+  saExecutionMode_Initializer = 33,
+  saExecutionMode_Finalizer = 34,
+  saExecutionMode_SubgroupSize = 35,
+  saExecutionMode_SubgroupsPerWorkgroup = 36,
+  saExecutionMode_SubgroupsPerWorkgroupId = 37,
+  saExecutionMode_LocalSizeId = 38,
+  saExecutionMode_LocalSizeHintId = 39,
+  saExecutionMode_NonCoherentColorAttachmentReadEXT = 4169,
+  saExecutionMode_NonCoherentDepthAttachmentReadEXT = 4170,
+  saExecutionMode_NonCoherentStencilAttachmentReadEXT = 4171,
+  saExecutionMode_SubgroupUniformControlFlowKHR = 4421,
+  saExecutionMode_PostDepthCoverage = 4446,
+  saExecutionMode_DenormPreserve = 4459,
+  saExecutionMode_DenormFlushToZero = 4460,
+  saExecutionMode_SignedZeroInfNanPreserve = 4461,
+  saExecutionMode_RoundingModeRTE = 4462,
+  saExecutionMode_RoundingModeRTZ = 4463,
+  saExecutionMode_EarlyAndLateFragmentTestsAMD = 5017,
+  saExecutionMode_StencilRefReplacingEXT = 5027,
+  saExecutionMode_CoalesaingAMDX = 5069,
+  saExecutionMode_IsApiEntryAMDX = 5070,
+  saExecutionMode_MaxNodeRecursionAMDX = 5071,
+  saExecutionMode_StaticNumWorkgroupsAMDX = 5072,
+  saExecutionMode_ShaderIndexAMDX = 5073,
+  saExecutionMode_MaxNumWorkgroupsAMDX = 5077,
+  saExecutionMode_StencilRefUnchangedFrontAMD = 5079,
+  saExecutionMode_StencilRefGreaterFrontAMD = 5080,
+  saExecutionMode_StencilRefLessFrontAMD = 5081,
+  saExecutionMode_StencilRefUnchangedBackAMD = 5082,
+  saExecutionMode_StencilRefGreaterBackAMD = 5083,
+  saExecutionMode_StencilRefLessBackAMD = 5084,
+  saExecutionMode_QuadDerivativesKHR = 5088,
+  saExecutionMode_RequireFullQuadsKHR = 5089,
+  saExecutionMode_ShareInputWithAMDX = 5102,
+  saExecutionMode_OutputLinesEXT = 5269,
+  saExecutionMode_OutputPrimitivesEXT = 5270,
+  saExecutionMode_DerivativeGroupQuadsKHR = 5289,
+  saExecutionMode_DerivativeGroupLinearKHR = 5290,
+  saExecutionMode_OutputTrianglesEXT = 5298,
+  saExecutionMode_PixelInterlockOrderedEXT = 5366,
+  saExecutionMode_PixelInterlockUnorderedEXT = 5367,
+  saExecutionMode_SamplerInterlockOrderedEXT = 5368,
+  saExecutionMode_SamplerInterlockUnorderedEXT = 5369,
+  saExecutionMode_ShadingRateInterlockOrderedEXT = 5370,
+  saExecutionMode_ShadingRateInterlockUnorderedEXT = 5371,
+  saExecutionMode_SharedLocalMemorySizeINTEL = 5618,
+  saExecutionMode_RoundingModeRTPINTEL = 5620,
+  saExecutionMode_RoundingModeRTNINTEL = 5621,
+  saExecutionMode_FloatingPointModeALTINTEL = 5622,
+  saExecutionMode_FloatingPointModeIEEEINTEL = 5623,
+  saExecutionMode_MaxWorkgroupSizeINTEL = 5893,
+  saExecutionMode_MaxWorkDimIMTEL = 5894,
+  saExecutionMode_NoGlobalOffsetINTEL = 5895,
+  saExecutionMode_NumSIMDWorkitemsINTEL = 5896,
+  saExecutionMode_schedulerTargetFmaxMhzINTEL = 5903,
+  saExecutionMode_MaximallyReconvergesKHR = 6023,
+  saExecutionMode_FPFastMathDefault = 6028,
+  saExecutionMode_StreamingInterfaceINTEL = 6154,
+  saExecutionMode_RegisterMapInterfaceINTEL = 6160,
+  saExecutionMode_NamedBarrierCountINTEL = 6417,
+  saExecutionMode_MaximumRegistersINTEL = 6461,
+  saExecutionMode_MaximumRegistersIdINTEL = 6462,
+  saExecutionMode_NamedMaximumRegistersINTEL = 6463,
 
-  saOpExecutionMode_OutputLinesNV = saOpExecutionMode_OutputLinesEXT,
-  saOpExecutionMode_OutputPrimitivesNV = saOpExecutionMode_OutputPrimitivesEXT,
-  saOpExecutionMode_DerivativeGroupQuadsNV = saOpExecutionMode_DerivativeGroupQuadsKHR,
-  saOpExecutionMode_DerivativeGroupLinearNV = saOpExecutionMode_DerivativeGroupLinearKHR,
-  saOpExecutionMode_OutputTrianglesNV = saOpExecutionMode_OutputTrianglesEXT
+  saExecutionMode_OutputLinesNV = saExecutionMode_OutputLinesEXT,
+  saExecutionMode_OutputPrimitivesNV = saExecutionMode_OutputPrimitivesEXT,
+  saExecutionMode_DerivativeGroupQuadsNV = saExecutionMode_DerivativeGroupQuadsKHR,
+  saExecutionMode_DerivativeGroupLinearNV = saExecutionMode_DerivativeGroupLinearKHR,
+  saExecutionMode_OutputTrianglesNV = saExecutionMode_OutputTrianglesEXT
 };
 
 // Used by OpTypePointer, OpTypeForwardPointer, OpVariable, OpGenericCastToPtrExplicit, OpTypeUndefinedPointerKHR, OpUntypedVariableKHR
-enum sa__OpStorageClass {
-  saOpStorageClass_UniformConstant = 0,
-  saOpStorageClass_Input = 1,
-  saOpStorageClass_Uniform = 2,
-  saOpStorageClass_Output = 3,
-  saOpStorageClass_Workgroup = 4,
-  saOpStorageClass_CrossWorkgroup = 5,
-  saOpStorageClass_Private = 6,
-  saOpStorageClass_Function = 7,
-  saOpStorageClass_Generic = 8,
-  saOpStorageClass_PushConstant = 9,
-  saOpStorageClass_AtomicCounter = 10,
-  saOpStorageClass_Image = 11,
-  saOpStorageClass_StorageBuffer = 12,
-  saOpStorageClass_TileImageEXT = 4172,
-  saOpStorageClass_NodePayloadAMDX = 5068,
-  saOpStorageClass_CallableDataKHR = 5328,
-  saOpStorageClass_IncomingCallableDataKHR = 5329,
-  saOpStorageClass_RayPayloadKHR = 5338,
-  saOpStorageClass_HitAttributeKHR = 5339,
-  saOpStorageClass_IncomingRayPayloadKHR = 5342,
-  saOpStorageClass_ShaderRecordBufferKHR = 5343,
-  saOpStorageClass_PhysicalStorageBuffer = 5349,
-  saOpStorageClass_HitObjectAttributeNV = 5385,
-  saOpStorageClass_TaskPayloadWorkgroupEXT = 5402,
-  saOpStorageClass_CodeSelectionINTEL = 5605,
-  saOpStorageClass_DeviceOnlyINTEL = 5936,
-  saOpStorageClass_HostOnlyINTEL = 5937,
+enum sa__StorageClass_e {
+  saStorageClass_UniformConstant = 0,
+  saStorageClass_Input = 1,
+  saStorageClass_Uniform = 2,
+  saStorageClass_Output = 3,
+  saStorageClass_Workgroup = 4,
+  saStorageClass_CrossWorkgroup = 5,
+  saStorageClass_Private = 6,
+  saStorageClass_Function = 7,
+  saStorageClass_Generic = 8,
+  saStorageClass_PushConstant = 9,
+  saStorageClass_AtomicCounter = 10,
+  saStorageClass_Image = 11,
+  saStorageClass_StorageBuffer = 12,
+  saStorageClass_TileImageEXT = 4172,
+  saStorageClass_NodePayloadAMDX = 5068,
+  saStorageClass_CallableDataKHR = 5328,
+  saStorageClass_IncomingCallableDataKHR = 5329,
+  saStorageClass_RayPayloadKHR = 5338,
+  saStorageClass_HitAttributeKHR = 5339,
+  saStorageClass_IncomingRayPayloadKHR = 5342,
+  saStorageClass_ShaderRecordBufferKHR = 5343,
+  saStorageClass_PhysicalStorageBuffer = 5349,
+  saStorageClass_HitObjectAttributeNV = 5385,
+  saStorageClass_TaskPayloadWorkgroupEXT = 5402,
+  saStorageClass_CodeSelectionINTEL = 5605,
+  saStorageClass_DeviceOnlyINTEL = 5936,
+  saStorageClass_HostOnlyINTEL = 5937,
 
-  saOpStorageClass_CallableDataNV = saOpStorageClass_CallableDataKHR,
-  saOpStorageClass_IncomingCallableDataNV = saOpStorageClass_IncomingCallableDataKHR,
-  saOpStorageClass_RayPayloadNV = saOpStorageClass_RayPayloadKHR,
-  saOpStorageClass_HitAttributeNV = saOpStorageClass_HitAttributeKHR,
-  saOpStorageClass_IncomingRayPayloadNV = saOpStorageClass_IncomingRayPayloadKHR,
-  saOpStorageClass_ShaderRecordBufferNV = saOpStorageClass_ShaderRecordBufferKHR,
-  saOpStorageClass_PhysicalStorageBufferEXT = saOpStorageClass_PhysicalStorageBuffer
+  saStorageClass_CallableDataNV = saStorageClass_CallableDataKHR,
+  saStorageClass_IncomingCallableDataNV = saStorageClass_IncomingCallableDataKHR,
+  saStorageClass_RayPayloadNV = saStorageClass_RayPayloadKHR,
+  saStorageClass_HitAttributeNV = saStorageClass_HitAttributeKHR,
+  saStorageClass_IncomingRayPayloadNV = saStorageClass_IncomingRayPayloadKHR,
+  saStorageClass_ShaderRecordBufferNV = saStorageClass_ShaderRecordBufferKHR,
+  saStorageClass_PhysicalStorageBufferEXT = saStorageClass_PhysicalStorageBuffer
 };
 
 // Used by OpTypeImage
-enum sa__OpImageDimmension {
-  saOpImageDimmension_1D = 0,
-  saOpImageDimmension_2D = 1,
-  saOpImageDimmension_3D = 2,
-  saOpImageDimmension_Cube = 3,
-  saOpImageDimmension_Rect = 4,
-  saOpImageDimmension_Buffer = 5,
-  saOpImageDimmension_SubpassData = 6,
-  saOpImageDimmension_TileImageDataEXT = 4173
+enum sa__ImageDimmension_e {
+  saImageDimmension_1D = 0,
+  saImageDimmension_2D = 1,
+  saImageDimmension_3D = 2,
+  saImageDimmension_Cube = 3,
+  saImageDimmension_Rect = 4,
+  saImageDimmension_Buffer = 5,
+  saImageDimmension_SubpassData = 6,
+  saImageDimmension_TileImageDataEXT = 4173
 };
 
 // Used by OpConstantSampler
-enum sa__OpSamplerAddressingMode {
-  saOpSamplerAddressingMode_None = 0,
-  saOpSamplerAddressingMode_ClampToEdge = 1,
-  saOpSamplerAddressingMode_Clamp = 2,
-  saOpSamplerAddressingMode_Repeat = 3,
-  saOpSamplerAddressingMode_RepeatMirrored = 4
+enum sa__OpSamplerAddressingMode_e {
+  saSamplerAddressingMode_None = 0,
+  saSamplerAddressingMode_ClampToEdge = 1,
+  saSamplerAddressingMode_Clamp = 2,
+  saSamplerAddressingMode_Repeat = 3,
+  saSamplerAddressingMode_RepeatMirrored = 4
 };
 
 // Used by OpConstantSampler
-enum sa__OpSamplerFilterMode {
-  saOpSamplerFilterMode_Nearest = 0,
-  saOpSamplerFilterMode_Linear = 1
+enum sa__SamplerFilterMode_e {
+  saSamplerFilterMode_Nearest = 0,
+  saSamplerFilterMode_Linear = 1
 };
 
 // Used by OpTypeImage
-enum sa__OpImageFormat {
-  saOpImageFormat_Unknown = 0,
-  saOpImageFormat_Rgba32f = 1,
-  saOpImageFormat_Rgba16f = 2,
-  saOpImageFormat_R32f = 3,
-  saOpImageFormat_Rgba8 = 4,
-  saOpImageFormat_Rgba8Snorm = 5,
-  saOpImageFormat_Rg32f = 6,
-  saOpImageFormat_Rg16f = 7,
-  saOpImageFormat_R11fG11fB10f = 8,
-  saOpImageFormat_R16f = 9,
-  saOpImageFormat_Rgba16 = 10,
-  saOpImageFormat_Rgb10A2 = 11,
-  saOpImageFormat_Rg16 = 12,
-  saOpImageFormat_Rg8 = 13,
-  saOpImageFormat_R16 = 14,
-  saOpImageFormat_R8 = 15,
-  saOpImageFormat_Rgba16Snorm = 16,
-  saOpImageFormat_Rg16Snorm = 17,
-  saOpImageFormat_Rg8Snorm = 18,
-  saOpImageFormat_R16Snorm = 19,
-  saOpImageFormat_R8Snorm = 20,
-  saOpImageFormat_Rgba32i = 21,
-  saOpImageFormat_Rgba16i = 22,
-  saOpImageFormat_Rgba8i = 23,
-  saOpImageFormat_R32i = 24,
-  saOpImageFormat_Rg32i = 25,
-  saOpImageFormat_Rg16i = 26,
-  saOpImageFormat_Rg8i = 27,
-  saOpImageFormat_R16i = 28,
-  saOpImageFormat_R8i = 29,
-  saOpImageFormat_Rgba32ui = 30,
-  saOpImageFormat_Rgba16ui = 31,
-  saOpImageFormat_Rgba8ui = 32,
-  saOpImageFormat_R32ui = 33,
-  saOpImageFormat_Rgb10a2ui = 34,
-  saOpImageFormat_Rg32ui = 35,
-  saOpImageFormat_Rg16ui = 36,
-  saOpImageFormat_Rg8ui = 37,
-  saOpImageFormat_R16ui = 38,
-  saOpImageFormat_R8ui = 39,
-  saOpImageFormat_R64ui = 40,
-  saOpImageFormat_R64i = 41
+enum sa__ImageFormat_e {
+  saImageFormat_Unknown = 0,
+  saImageFormat_Rgba32f = 1,
+  saImageFormat_Rgba16f = 2,
+  saImageFormat_R32f = 3,
+  saImageFormat_Rgba8 = 4,
+  saImageFormat_Rgba8Snorm = 5,
+  saImageFormat_Rg32f = 6,
+  saImageFormat_Rg16f = 7,
+  saImageFormat_R11fG11fB10f = 8,
+  saImageFormat_R16f = 9,
+  saImageFormat_Rgba16 = 10,
+  saImageFormat_Rgb10A2 = 11,
+  saImageFormat_Rg16 = 12,
+  saImageFormat_Rg8 = 13,
+  saImageFormat_R16 = 14,
+  saImageFormat_R8 = 15,
+  saImageFormat_Rgba16Snorm = 16,
+  saImageFormat_Rg16Snorm = 17,
+  saImageFormat_Rg8Snorm = 18,
+  saImageFormat_R16Snorm = 19,
+  saImageFormat_R8Snorm = 20,
+  saImageFormat_Rgba32i = 21,
+  saImageFormat_Rgba16i = 22,
+  saImageFormat_Rgba8i = 23,
+  saImageFormat_R32i = 24,
+  saImageFormat_Rg32i = 25,
+  saImageFormat_Rg16i = 26,
+  saImageFormat_Rg8i = 27,
+  saImageFormat_R16i = 28,
+  saImageFormat_R8i = 29,
+  saImageFormat_Rgba32ui = 30,
+  saImageFormat_Rgba16ui = 31,
+  saImageFormat_Rgba8ui = 32,
+  saImageFormat_R32ui = 33,
+  saImageFormat_Rgb10a2ui = 34,
+  saImageFormat_Rg32ui = 35,
+  saImageFormat_Rg16ui = 36,
+  saImageFormat_Rg8ui = 37,
+  saImageFormat_R16ui = 38,
+  saImageFormat_R8ui = 39,
+  saImageFormat_R64ui = 40,
+  saImageFormat_R64i = 41
 };
 
 // Used bu OpImageQueryOrder
-enum sa__OpImageChannelOrder {
-  saOpImageChannelOrder_R = 0,
-  saOpImageChannelOrder_A = 1,
-  saOpImageChannelOrder_RG = 2,
-  saOpImageChannelOrder_RA = 3,
-  saOpImageChannelOrder_RGB = 4,
-  saOpImageChannelOrder_RGBA = 5,
-  saOpImageChannelOrder_BGRA = 6,
-  saOpImageChannelOrder_ARGB = 7,
-  saOpImageChannelOrder_Intensity = 8,
-  saOpImageChannelOrder_Luminance = 9,
-  saOpImageChannelOrder_Rx = 10,
-  saOpImageChannelOrder_RGx = 11,
-  saOpImageChannelOrder_RGBx = 12,
-  saOpImageChannelOrder_Depth = 13,
-  saOpImageChannelOrder_DepthStencil = 14,
-  saOpImageChannelOrder_sRGB = 15,
-  saOpImageChannelOrder_sRGBx = 16,
-  saOpImageChannelOrder_sRGBA = 17,
-  saOpImageChannelOrder_sBGRA = 18,
-  saOpImageChannelOrder_ABGR = 19
+enum sa__ImageChannelOrder_e {
+  saImageChannelOrder_R = 0,
+  saImageChannelOrder_A = 1,
+  saImageChannelOrder_RG = 2,
+  saImageChannelOrder_RA = 3,
+  saImageChannelOrder_RGB = 4,
+  saImageChannelOrder_RGBA = 5,
+  saImageChannelOrder_BGRA = 6,
+  saImageChannelOrder_ARGB = 7,
+  saImageChannelOrder_Intensity = 8,
+  saImageChannelOrder_Luminance = 9,
+  saImageChannelOrder_Rx = 10,
+  saImageChannelOrder_RGx = 11,
+  saImageChannelOrder_RGBx = 12,
+  saImageChannelOrder_Depth = 13,
+  saImageChannelOrder_DepthStencil = 14,
+  saImageChannelOrder_sRGB = 15,
+  saImageChannelOrder_sRGBx = 16,
+  saImageChannelOrder_sRGBA = 17,
+  saImageChannelOrder_sBGRA = 18,
+  saImageChannelOrder_ABGR = 19
 };
 
 // Used by OpImageQueryFormat
-enum sa__OpImageChannelDataType {
-  saOpImageChannelDataFormat_SnormInt8 = 0,
-  saOpImageChannelDataFormat_SnormInt16 = 1,
-  saOpImageChannelDataFormat_UnormInt8 = 2,
-  saOpImageChannelDataFormat_UnormInt16 = 3,
-  saOpImageChannelDataFormat_UnormShort565 = 4,
-  saOpImageChannelDataFormat_UnormShort555 = 5,
-  saOpImageChannelDataFormat_UnormInt101010 = 6,
-  saOpImageChannelDataFormat_SignedInt8 = 7,
-  saOpImageChannelDataFormat_SignedInt16 = 8,
-  saOpImageChannelDataFormat_SignedInt32 = 9,
-  saOpImageChannelDataFormat_UnsignedInt8 = 10,
-  saOpImageChannelDataFormat_UnsignedInt16 = 11,
-  saOpImageChannelDataFormat_UnsignedInt32 = 12,
-  saOpImageChannelDataFormat_HalfFloat = 13,
-  saOpImageChannelDataFormat_Float = 14,
-  saOpImageChannelDataFormat_UnormInt24 = 15,
-  saOpImageChannelDataFormat_UnormInt101010_2 = 16,
-  saOpImageChannelDataFormat_UnsignedIntRaw10EXT = 19,
-  saOpImageChannelDataFormat_UnsignedIntRaw12EXT = 20,
-  saOpImageChannelDataFormat_UnormInt2_101010EXT = 21,
-  saOpImageChannelDataFormat_UnsignedInt10X6EXT = 22,
-  saOpImageChannelDataFormat_UnsignedInt12X4EXT = 23,
-  saOpImageChannelDataFormat_UnsignedInt14X2EXT = 24,
-  saOpImageChannelDataFormat_UnormInt12X4EXT = 25,
-  saOpImageChannelDataFormat_UnormInt14X2EXT = 26
+enum sa__ImageChannelDataType_e {
+  saImageChannelDataFormat_SnormInt8 = 0,
+  saImageChannelDataFormat_SnormInt16 = 1,
+  saImageChannelDataFormat_UnormInt8 = 2,
+  saImageChannelDataFormat_UnormInt16 = 3,
+  saImageChannelDataFormat_UnormShort565 = 4,
+  saImageChannelDataFormat_UnormShort555 = 5,
+  saImageChannelDataFormat_UnormInt101010 = 6,
+  saImageChannelDataFormat_SignedInt8 = 7,
+  saImageChannelDataFormat_SignedInt16 = 8,
+  saImageChannelDataFormat_SignedInt32 = 9,
+  saImageChannelDataFormat_UnsignedInt8 = 10,
+  saImageChannelDataFormat_UnsignedInt16 = 11,
+  saImageChannelDataFormat_UnsignedInt32 = 12,
+  saImageChannelDataFormat_HalfFloat = 13,
+  saImageChannelDataFormat_Float = 14,
+  saImageChannelDataFormat_UnormInt24 = 15,
+  saImageChannelDataFormat_UnormInt101010_2 = 16,
+  saImageChannelDataFormat_UnsignedIntRaw10EXT = 19,
+  saImageChannelDataFormat_UnsignedIntRaw12EXT = 20,
+  saImageChannelDataFormat_UnormInt2_101010EXT = 21,
+  saImageChannelDataFormat_UnsignedInt10X6EXT = 22,
+  saImageChannelDataFormat_UnsignedInt12X4EXT = 23,
+  saImageChannelDataFormat_UnsignedInt14X2EXT = 24,
+  saImageChannelDataFormat_UnormInt12X4EXT = 25,
+  saImageChannelDataFormat_UnormInt14X2EXT = 26
 };
 
 // Used by: OpImageSampleImplicitLod, OpImageSampleExplicitLod, OpImageSampleDrefImplicitLod, OpImageSampleDrefExplicitLod, OpImageSampleProjImplicitLod, OpImageSampleProjExplicitLod, 
 // OpImageSampleProjDrefImplicitLod, OpImageSampleProjDrefExplicitLod, OpImageFetch, OpImageGather, OpImageDrefGather, OpImageRead, OpImageWrite, OpImageSparseSampleImplicitLod, 
 // OpImageSparseSampleExplicitLod, OpImageSparseSampleDrefImplicitLod, OpImageSparseSampleDrefExplicitLod, OpImageSparseFetch, OpImageSparseGather, OpImageSparseDrefGather, OpImageSparseRead, OpImageSampleFootprintNV
-enum sa__OpImageOperands {
-  saOpImageOperands_None = 0x0,
-  saOpImageOperands_Bias = 0x1,
-  saOpImageOperands_Lod = 0x2,
-  saOpImageOperands_Grad = 0x4,
-  saOpImageOperands_ConstOffset = 0x8,
-  saOpImageOperands_Offset = 0x10,
-  saOpImageOperands_ConstOffsets = 0x20,
-  saOpImageOperands_Sample = 0x40,
-  saOpImageOperands_MinLod = 0x80,
-  saOpImageOperands_MakeTexelAvailable = 0x100,
-  saOpImageOperands_MakeTexelVisible = 0x200,
-  saOpImageOperands_NonPrivateTexel = 0x400,
-  saOpImageOperands_VolatileTexel = 0x800,
-  saOpImageOperands_SignExtent = 0x1000,
-  saOpImageOperands_ZeroExtent = 0x2000,
-  saOpImageOperands_Nontemporal = 0x4000,
-  saOpImageOperands_Offsets = 0x10000,
+enum sa__ImageOperands_e {
+  saImageOperands_None = 0x0,
+  saImageOperands_Bias = 0x1,
+  saImageOperands_Lod = 0x2,
+  saImageOperands_Grad = 0x4,
+  saImageOperands_ConstOffset = 0x8,
+  saImageOperands_Offset = 0x10,
+  saImageOperands_ConstOffsets = 0x20,
+  saImageOperands_Sample = 0x40,
+  saImageOperands_MinLod = 0x80,
+  saImageOperands_MakeTexelAvailable = 0x100,
+  saImageOperands_MakeTexelVisible = 0x200,
+  saImageOperands_NonPrivateTexel = 0x400,
+  saImageOperands_VolatileTexel = 0x800,
+  saImageOperands_SignExtent = 0x1000,
+  saImageOperands_ZeroExtent = 0x2000,
+  saImageOperands_Nontemporal = 0x4000,
+  saImageOperands_Offsets = 0x10000,
   
-  saOpImageOperands_MakeTexelAvailableKHR = saOpImageOperands_MakeTexelAvailable,
-  saOpImageOperands_MakeTexelVisibleKHR = saOpImageOperands_MakeTexelVisible,
-  saOpImageOperands_NonPrivateTexelKHR = saOpImageOperands_NonPrivateTexel,
-  saOpImageOperands_VolatileTexelKHR = saOpImageOperands_VolatileTexel
+  saImageOperands_MakeTexelAvailableKHR = saImageOperands_MakeTexelAvailable,
+  saImageOperands_MakeTexelVisibleKHR = saImageOperands_MakeTexelVisible,
+  saImageOperands_NonPrivateTexelKHR = saImageOperands_NonPrivateTexel,
+  saImageOperands_VolatileTexelKHR = saImageOperands_VolatileTexel
 };
 
 // Used by: OpFAdd, OpFSub, OpFMul, OpFDiv, OpFRem, OpFMod
@@ -453,19 +443,238 @@ enum sa__OpImageOperands {
 // OpFUnordNotEqual, OpFOrdLessThan, OpFUnordLessThan, OpFOrdGreaterThan,
 // OpFUnordGreaterThan, OpFOrdLessThanEqual, OpFUnordLessThanEqual,
 // OpFOrdGreaterThanEqual, OpFUnordGreaterThanEqual, OpExtInst
-enum sa__OpFPFastMathMode {
-  saOpFPFastMathMode_None = 0x0,
-  saOpFPFastMathMode_NotNan = 0x1,
-  saOpFPFastMathMode_NotInf = 0x2,
-  saOpFPFastMathMode_NSZ = 0x4,
-  saOpFPFastMathMode_AllowReciprocal = 0x8,
-  saOpFPFastMathMode_Fast = 0x10,
-  saOpFPFastMathMode_AllowContract = 0x10000,
-  saOpFPFastMathMode_AllowReassoc = 0x20000,
-  saOpFPFastMathMode_AllowTransform = 0x40000,
+enum sa__FPFastMathMode_e {
+  saFPFastMathMode_None = 0x0,
+  saFPFastMathMode_NotNan = 0x1,
+  saFPFastMathMode_NotInf = 0x2,
+  saFPFastMathMode_NSZ = 0x4,
+  saFPFastMathMode_AllowReciprocal = 0x8,
+  saFPFastMathMode_Fast = 0x10,
+  saFPFastMathMode_AllowContract = 0x10000,
+  saFPFastMathMode_AllowReassoc = 0x20000,
+  saFPFastMathMode_AllowTransform = 0x40000,
 
-  saOpFPFastMathMode_AllowContractINTEL = saOpFPFastMathMode_AllowContract,
-  saOpFPFastMathMode_AllowReassocINTEL = saOpFPFastMathMode_AllowReassoc,
+  saFPFastMathMode_AllowContractINTEL = saFPFastMathMode_AllowContract,
+  saFPFastMathMode_AllowReassocINTEL = saFPFastMathMode_AllowReassoc,
+};
+
+enum sa__FPRoundingMode_e {
+  saFPRoundingMode_ToNearestEven = 0,
+  saFPRoundingMode_ToZero = 1,
+  saFPRoundingMode_ToPositiveInfinity = 2,
+  saFPRoundingMode_ToNegativeInfinity = 3
+};
+
+enum sa__LinkageType_e {
+  saLinkageType_Export = 0,
+  saLinkageType_Import = 1,
+  saLinkageType_LinkOnceODR = 2
+};
+
+enum sa__AccessQualifiers_e {
+  saAccessQualifiers_ReadOnly = 0,
+  saAccessQualifiers_WriteOnly = 1,
+  saAccessQualifiers_ReadWrite = 2
+};
+
+enum sa__FunctionParameterAttrib_e {
+  saFunctionParameterAttrib_ZeroExtend = 0,
+  saFunctionParameterAttrib_SignExtend = 1,
+  saFunctionParameterAttrib_ByValue = 2,
+  saFunctionParameterAttrib_StructReturn = 3,
+  saFunctionParameterAttrib_NoAlias = 4,
+  saFunctionParameterAttrib_NoCaptute = 5,
+  saFunctionParameterAttrib_NoWrite = 6,
+  saFunctionParameterAttrib_NoReadWrite = 7,
+};
+
+enum sa__Decoration_e {
+  saDecoration_RelaxedPrecision = 0,
+  saDecoration_SpecId = 1,
+  saDecoration_Block = 2,
+  saDecoration_BufferBlock = 3,
+  saDecoration_RowMajor = 4,
+  saDecoration_ColMajor = 5,
+  saDecoration_ArrayStride = 6,
+  saDecoration_MatrixStride = 7,
+  saDecoration_GLSLShared = 8,
+  saDecoration_GLSLPacked = 9,
+  saDecoration_CPacked = 10,
+  saDecoration_BuiltIn = 11,
+  saDecoration_NoPerspective = 13,
+  saDecoration_Flat = 14,
+  saDecoration_Patch = 15,
+  saDecoration_Centroid = 16,
+  saDecoration_Sample = 17,
+  saDecoration_Invariant = 18,
+  saDecoration_Restrict = 19,
+  saDecoration_Aliased = 20,
+  saDecoration_Volatile = 21,
+  saDecoration_Constant = 22,
+  saDecoration_Coherent = 23,
+  saDecoration_NonWritable = 24,
+  saDecoration_NonReadable = 25,
+  saDecoration_Uniform = 26,
+  saDecoration_UniformId = 27,
+  saDecoration_SaturatedConversion = 28,
+  saDecoration_Stream = 29,
+  saDecoration_Location = 30,
+  saDecoration_Component = 31,
+  saDecoration_Index = 32,
+  saDecoration_Binding = 33,
+  saDecoration_DescriptorSet = 34,
+  saDecoration_Offset = 35,
+  saDecoration_XfbBuffer = 36,
+  saDecoration_XfbStride = 37,
+  saDecoration_FuncParamAttrib = 38,
+  saDecoration_FPRoundingMode = 39,
+  saDecoration_FPFastMathMode = 40,
+  saDecoration_LinkageAttribs = 41,
+  saDecoration_NoContraction = 42,
+  saDecoration_InputAttachmentIndex = 43,
+  saDecoration_Alignment = 44,
+  saDecoration_MaxByteOffset = 45,
+  saDecoration_AlignmentId = 46,
+  saDecoration_MaxByteOffsetId = 47,
+};
+
+enum sa_DecorationBuiltIns_e {
+  saDecorationBuiltIn_Position = 0,
+  saDecorationBuiltIn_PointSize = 1,
+  saDecorationBuiltIn_ClipDistance = 3,
+  saDecorationBuiltIn_CullDistance = 4,
+  saDecorationBuiltIn_VertexId = 5,
+  saDecorationBuiltIn_InstanceId = 6,
+  saDecorationBuiltIn_PrimitiveId = 7,
+  saDecorationBuiltIn_InvocationId = 8,
+  saDecorationBuiltIn_Layer = 9,
+  saDecorationBuiltIn_ViewportIndex = 10,
+  saDecorationBuiltIn_TessLevelOuter = 11,
+  saDecorationBuiltIn_TessLevelInner = 12,
+  saDecorationBuiltIn_TessCoord = 13,
+  saDecorationBuiltIn_PatchVertices = 14,
+  saDecorationBuiltIn_FragCoord = 15,
+  saDecorationBuiltIn_PointCoord = 16,
+  saDecorationBuiltIn_FrontFacing = 17,
+  saDecorationBuiltIn_SampleId = 18,
+  saDecorationBuiltIn_SamplePosition = 19,
+  saDecorationBuiltIn_SampleMask = 20,
+  saDecorationBuiltIn_FragDepth = 22,
+  saDecorationBuiltIn_HelperInvocation = 23,
+  saDecorationBuiltIn_NumWorkgroups = 24,
+  saDecorationBuiltIn_WorkgroupSize = 25,
+  saDecorationBuiltIn_WorkgroupId = 26,
+  saDecorationBuiltIn_LocalInvocationId = 27,
+  saDecorationBuiltIn_GlobalInvocationId = 28,
+  saDecorationBuiltIn_LocalInvocationIndex = 29,
+  saDecorationBuiltIn_WorkDim = 30,
+  saDecorationBuiltIn_GlobalSize = 31,
+  saDecorationBuiltIn_EnqueuedWorkgroupSize = 32,
+  saDecorationBuiltIn_GlobalOffset = 33,
+  saDecorationBuiltIn_GlobalLinearId = 34,
+  saDecorationBuiltIn_SubgroupSize = 36,
+  saDecorationBuiltIn_SubgroupMaxSize = 37,
+  saDecorationBuiltIn_NumSubgroups = 38,
+  saDecorationBuiltIn_NumEnqueuedSubgroups = 39,
+  saDecorationBuiltIn_SubgroupId = 40,
+  saDecorationBuiltIn_SubgroupLocalInvocationId = 41,
+  saDecorationBuiltIn_VertexIndex = 42,
+  saDecorationBuiltIn_InstanceIndex = 43
+};
+
+enum sa__SelectionControl_e {
+  saSelectionControl_None = 0x0,
+  saSelectionControl_Flatten = 0x1,
+  saSelectionControl_DontFlatten = 0x2
+};
+
+enum sa__LoopControl_e {
+  saLoopControl_None = 0x0,
+  saLoopControl_Unroll = 0x1,
+  saLoopControl_DontUnroll = 0x2,
+  saLoopControl_DependencyInfinite = 0x4,
+  saLoopControl_DependencyLength = 0x8,
+  saLoopControl_MinIterations = 0x10,
+  saLoopControl_MaxIterations = 0x20,
+  saLoopControl_IterationMultiple = 0x40,
+  saLoopControl_PeelCount = 0x80,
+  saLoopControl_PartialCount = 0x100
+};
+
+enum sa__FunctionControl_e {
+  saFunctionControl_None = 0x0,
+  saFunctionControl_Inline = 0x1,
+  saFunctionControl_DontInline = 0x2,
+  saFunctionControl_Pure = 0x4,
+  saFunctionControl_Const = 0x8
+};
+
+enum sa__MemorySemantics_e {
+  saMemorySemantics_None = 0x0,
+  saMemorySemantics_Acquire = 0x2,
+  saMemorySemantics_Release = 0x4,
+  saMemorySemantics_AcquireRelease = 0x8,
+  saMemorySemantics_SequentiallyConsistent = 0x10,
+  saMemorySemantics_UniformMemory = 0x40,
+  saMemorySemantics_SubgroupMemory = 0x80,
+  saMemorySemantics_WorkgroupMemory = 0x100,
+  saMemorySemantics_CrossWorkgroupMemory = 0x200,
+  saMemorySemantics_AtomicCounterMemory = 0x400,
+  saMemorySemantics_ImageMemory = 0x800,
+  saMemorySemantics_OutputMemory = 0x1000,
+  saMemorySemantics_MakeAvailable = 0x2000,
+  saMemorySemantics_MakeVisible = 0x4000,
+  saMemorySemantics_Volatile = 0x8000
+};
+
+enum sa__MemoryOperands_e {
+  saMemoryOperands_None = 0x0,
+  saMemoryOperands_Volatile = 0x1,
+  saMemoryOperands_Aligned = 0x2,
+  saMemoryOperands_Nontemporal = 0x4,
+  saMemoryOperands_MakePointerAvailable = 0x8,
+  saMemoryOperands_MakePointerVisible = 0x10,
+  saMemoryOperands_NonPrivatePointer = 0x20
+};
+
+enum sa__Scope_e {
+  saScope_CrossDevice = 0,
+  saScope_Device = 1,
+  saScope_Workgroup = 2,
+  saScope_Subgroup = 3,
+  saScope_Invocation = 4,
+  saScope_QueueFamily = 5,
+  saScope_ShaderCallKHR = 6
+};
+
+enum sa__GroupOperation_e {
+  saGroupOperation_Reduce = 0,
+  saGroupOperation_InclusiveScan = 1,
+  saGroupOperation_ExclusiveScan = 2,
+  saGroupOperation_ClusterReduce = 3
+};
+
+enum sa__KernelEnqueueFlags_e {
+  saKernelEnqueueFlag_NoWait = 0,
+  saKernelEnqueueFlag_WaitKernels = 1,
+  saKernelEnqueueFlag_WaitWorkgroup = 2
+};
+
+enum sa__KernelProfilingInfo_e {
+  saKernelProfilingInfo_None = 0x0,
+  saKernelProfilingInfo_CmdExecTime = 0x1
+};
+
+// Used by OpCapability
+// XXX: For now there are only needed capabilities
+enum sa__Capability_e {
+  // Basically useless, because it is defined with Shader capability
+  saCapability_Matrix = 0,
+  // Used by vertex, fragment and compute shaders
+  saCapability_Shader = 1,
+  saCapability_Geometry = 2,
+  saCapability_Tesselation = 3,
+  // TODO: Add all of capabilities
 };
 
 typedef enum sa__OpCodesCore_e {
@@ -977,6 +1186,35 @@ typedef enum sa__OpCodesCore_e {
   saOp_PtrDiff = 403
 */
 
+enum sa__AssemblerLowLevelEnum {
+  saAsmEnum_EntryPoint = 0,
+  saAsmEnum_StorageClass,
+  saAsmEnum_ImageDimmension,
+  saAsmEnum_SamplerAddressingMode,
+  saAsmEnum_SamplerFilterMode,
+  saAsmEnum_ImageFormat,
+  saAsmEnum_ImageChannelOrder,
+  saAsmEnum_ImageChannelDataFormat,
+  saAsmEnum_ImageOperand,
+  saAsmEnum_FPFastMath,
+  saAsmEnum_FPRoundingMode,
+  saAsmEnum_LinkageType,
+  saAsmEnum_AccessQualifier,
+  saAsmEnum_FunctionParameterAttrib,
+  saAsmEnum_Decoration,
+  saAsmEnum_DecorationBuiltIn,
+  saAsmEnum_SelectionControl,
+  saAsmEnum_LoopControl,
+  saAsmEnum_FunctionControl,
+  saAsmEnum_MemorySemantics,
+  saAsmEnum_MemoryOperand,
+  saAsmEnum_Scope,
+  saAsmEnum_GroupOperation,
+  saAsmEnum_ExecutionMode,
+
+  saAsmEnum_COUNT
+};
+
 enum sa__AssemblySectionType_e {
   saSectionType_Capability = 0,
   saSectionType_Extensions,
@@ -1052,704 +1290,1211 @@ typedef struct sa_assembly_s {
 struct sa__assemblerErrorMessages_s {
   char** pMessages;
   sa_uint32_t messagesAmount;
-} __gAssemblerErrorMessages;
+};
 
 struct sa__assemblerLowLevelOpCodeConnection_s {
-  const char* opcodeSemantic;
-  sa_uint32_t opcode;
-  sa_uint32_t argc;
-  sa_bool plusVariable;
+  const char* opcodeMnemonic;
+  const sa_uint32_t opcode;
+  const sa_uint32_t wordCount;
+  const sa_bool plusVariable;
+  // Could be that all are possible, SA_UINT32_MAX mean end of the values
+  const sa_uint32_t possibleEnumerant[saAsmEnum_COUNT];
+};
+
+struct sa__assemblerLowLevelEnumerantConnection_s {
+  const char* enumerantMnemonic;
+  sa_uint32_t enumerant;
 };
 
 static sa_uint32_t __gIdGeneratorHoldValue = 0;
+static struct sa__assemblerErrorMessages_s __gAssemblerErrorMessages = {0};
 
-const struct sa__assemblerLowLevelOpCodeConnection_s LOW_LEVEL_OPCODES[] = {
+const struct sa__assemblerLowLevelOpCodeConnection_s SA_ASSEMBLER_LOW_LEVEL_OPCODES[] = {
   // semantic,                                  opcode,                                       argc, +var
-  { "Nop",                                      saOp_Nop,                                       1, SA_FALSE },
-  { "Undef",                                    saOp_Undef,                                     3, SA_FALSE },
-  { "SourceContinued",                          saOp_SourceContinued,                           2, SA_TRUE  },
-  { "Source",                                   saOp_Source,                                    3, SA_TRUE  },
-  { "SourceExtension",                          saOp_SourceExtension,                           2, SA_TRUE  },
-  { "Name",                                     saOp_Name,                                      3, SA_TRUE  },
-  { "MemberName",                               saOp_MemberName,                                4, SA_TRUE  },
-  { "String",                                   saOp_String,                                    3, SA_TRUE  },
-  { "Line",                                     saOp_Line,                                      4, SA_FALSE },
-  { "Extension",                                saOp_Extension,                                 2, SA_TRUE  },
-  { "ExtInstImport",                            saOp_ExtInstImport,                             3, SA_TRUE  },
-  { "ExtInst",                                  saOp_ExtInst,                                   5, SA_TRUE  },
-  { "MemoryModel",                              saOp_MemoryModel,                               3, SA_FALSE },
-  { "EntryPoint",                               saOp_EntryPoint,                                4, SA_TRUE  },
-  { "ExecutionMode",                            saOp_ExecutionMode,                             3, SA_TRUE  },
-  { "Capability",                               saOp_Capability,                                2, SA_FALSE },
-  { "TypeVoid",                                 saOp_TypeVoid,                                  2, SA_FALSE },
-  { "TypeBool",                                 saOp_TypeBool,                                  2, SA_FALSE },
-  { "TypeInt",                                  saOp_TypeInt,                                   4, SA_FALSE },
-  { "TypeFloat",                                saOp_TypeFloat,                                 3, SA_TRUE  },
-  { "TypeVector",                               saOp_TypeVector,                                4, SA_FALSE },
-  { "TypeMatrix",                               saOp_TypeMatrix,                                4, SA_FALSE },
-  { "TypeImage",                                saOp_TypeImage,                                 9, SA_TRUE  },
-  { "TypeSampler",                              saOp_TypeSampler,                               2, SA_FALSE },
-  { "TypeSampledImage",                         saOp_TypeSampledImage,                          3, SA_FALSE },
-  { "TypeArray",                                saOp_TypeArray,                                 4, SA_FALSE },
-  { "TypeRuntimeArray",                         saOp_TypeRuntimeArray,                          3, SA_FALSE },
-  { "TypeStruct",                               saOp_TypeStruct,                                2, SA_TRUE  },
-  { "TypeOpaque",                               saOp_TypeOpaque,                                3, SA_TRUE  },
-  { "TypePointer",                              saOp_TypePointer,                               4, SA_FALSE },
-  { "TypeFunction",                             saOp_TypeFunction,                              3, SA_TRUE  },
-  { "TypeEvent",                                saOp_TypeEvent,                                 2, SA_FALSE },
-  { "TypeDeviceEvent",                          saOp_TypeDeviceEvent,                           2, SA_FALSE },
-  { "TypeReserveId",                            saOp_TypeReserveId,                             2, SA_FALSE },
-  { "TypeQueue",                                saOp_TypeQueue,                                 2, SA_FALSE },
-  { "TypePipe",                                 saOp_TypePipe,                                  3, SA_FALSE },
-  { "TypeForwardPointer",                       saOp_TypeForwardPointer,                        3, SA_FALSE },
-  { "ConstantTrue",                             saOp_ConstantTrue,                              3, SA_FALSE },
-  { "ConstantFalse",                            saOp_ConstantFalse,                             3, SA_FALSE },
-  { "Constant",                                 saOp_Constant,                                  4, SA_TRUE  },
-  { "ConstantComposite",                        saOp_ConstantComposite,                         3, SA_TRUE  },
-  { "ConstantSampler",                          saOp_ConstantSampler,                           6, SA_FALSE },
-  { "ConstantNull",                             saOp_ConstantNull,                              3, SA_FALSE },
-  { "SpecConstantTrue",                         saOp_SpecConstantTrue,                          3, SA_FALSE },
-  { "SpecConstantFalse",                        saOp_SpecConstantFalse,                         3, SA_FALSE },
-  { "SpecConstant",                             saOp_SpecConstant,                              4, SA_TRUE  },
-  { "SpecConstantComposite",                    saOp_SpecConstantComposite,                     3, SA_TRUE  },
-  { "SpecConstantOp",                           saOp_SpecConstantOp,                            4, SA_TRUE  },
-  { "Function",                                 saOp_Function,                                  5, SA_FALSE },
-  { "FunctionParameter",                        saOp_FunctionParameter,                         3, SA_FALSE },
-  { "FunctionEnd",                              saOp_FunctionEnd,                               1, SA_FALSE },
-  { "FunctionCall",                             saOp_FunctionCall,                              4, SA_TRUE  },
-  { "Variable",                                 saOp_Variable,                                  4, SA_TRUE  },
-  { "ImageTexelPointer",                        saOp_ImageTexelPointer,                         6, SA_FALSE },
-  { "Load",                                     saOp_Load,                                      4, SA_TRUE  },
-  { "Store",                                    saOp_Store,                                     3, SA_TRUE  },
-  { "CopyMemory",                               saOp_CopyMemory,                                3, SA_TRUE  },
-  { "CopyMemorySized",                          saOp_CopyMemorySized,                           4, SA_TRUE  },
-  { "AccessChain",                              saOp_AccessChain,                               4, SA_TRUE  },
-  { "InBoundsAccessChain",                      saOp_InBoundsAccessChain,                       4, SA_TRUE  },
-  { "PtrAccessChain",                           saOp_PtrAccessChain,                            5, SA_TRUE  },
-  { "ArrayLength",                              saOp_ArrayLength,                               5, SA_FALSE },
-  { "GenericPtrMemSemantics",                   saOp_GenericPtrMemSemantics,                    4, SA_FALSE },
-  { "InBoundsPtrAccessChain",                   saOp_InBoundsPtrAccessChain,                    5, SA_TRUE  },
-  { "Decorate",                                 saOp_Decorate,                                  3, SA_TRUE  },
-  { "MemberDecorate",                           saOp_MemberDecorate,                            4, SA_TRUE  },
-  { "DecorationGroup",                          saOp_DecorationGroup,                           2, SA_FALSE },
-  { "GroupDecorate",                            saOp_GroupDecorate,                             2, SA_TRUE  },
-  { "GroupMemberDecorate",                      saOp_GroupMemberDecorate,                       2, SA_TRUE  },
-  { "VectorExtractDynamic",                     saOp_VectorExtractDynamic,                      5, SA_FALSE },
-  { "VectorInsertDynamic",                      saOp_VectorInsertDynamic,                       6, SA_FALSE },
-  { "VectorShuffle",                            saOp_VectorShuffle,                             5, SA_TRUE  },
-  { "CompositeConstruct",                       saOp_CompositeConstruct,                        3, SA_TRUE  },
-  { "CompositeExtract",                         saOp_CompositeExtract,                          4, SA_TRUE  },
-  { "CompositeInsert",                          saOp_CompositeInsert,                           5, SA_TRUE  },
-  { "CopyObject",                               saOp_CopyObject,                                4, SA_FALSE },
-  { "Transpose",                                saOp_Transpose,                                 4, SA_FALSE },
-  { "SampledImage",                             saOp_SampledImage,                              5, SA_FALSE },
-  { "ImageSampleImplicitLod",                   saOp_ImageSampleImplicitLod,                    5, SA_TRUE  },
-  { "ImageSampleExplicitLod",                   saOp_ImageSampleExplicitLod,                    7, SA_TRUE  },
-  { "ImageSampleDrefImplicitLod",               saOp_ImageSampleDrefImplicitLod,                6, SA_TRUE  },
-  { "ImageSampleDrefExplicitLod",               saOp_ImageSampleDrefExplicitLod,                8, SA_TRUE  },
-  { "ImageSampleProjImplicitLod",               saOp_ImageSampleProjImplicitLod,                5, SA_TRUE  },
-  { "ImageSampleProjExplicitLod",               saOp_ImageSampleProjExplicitLod,                7, SA_TRUE  },
-  { "ImageSampleProjDrefImplicitLod",           saOp_ImageSampleProjDrefImplicitLod,            6, SA_TRUE  },
-  { "ImageSampleProjDrefExplicitLod",           saOp_ImageSampleProjDrefExplicitLod,            8, SA_TRUE  },
-  { "ImageFetch",                               saOp_ImageFetch,                                5, SA_TRUE  },
-  { "ImageGather",                              saOp_ImageGather,                               6, SA_TRUE  },
-  { "ImageDrefGather",                          saOp_ImageDrefGather,                           6, SA_TRUE  },
-  { "ImageRead",                                saOp_ImageRead,                                 5, SA_TRUE  },
-  { "ImageWrite",                               saOp_ImageWrite,                                4, SA_TRUE  },
-  { "Image",                                    saOp_Image,                                     4, SA_FALSE },
-  { "ImageQueryFormat",                         saOp_ImageQueryFormat,                          4, SA_FALSE },
-  { "ImageQueryOrder",                          saOp_ImageQueryOrder,                           4, SA_FALSE },
-  { "ImageQuerySizeLod",                        saOp_ImageQuerySizeLod,                         5, SA_FALSE },
-  { "ImageQuerySize",                           saOp_ImageQuerySize,                            4, SA_FALSE },
-  { "ImageQueryLod",                            saOp_ImageQueryLod,                             5, SA_FALSE },
-  { "ImageQueryLevels",                         saOp_ImageQueryLevels,                          4, SA_FALSE },
-  { "ImageQuerySamples",                        saOp_ImageQuerySamples,                         4, SA_FALSE },
-  { "ConvertFToU",                              saOp_ConvertFToU,                               4, SA_FALSE },
-  { "ConvertFToS",                              saOp_ConvertFToS,                               4, SA_FALSE },
-  { "ConvertSToF",                              saOp_ConvertSToF,                               4, SA_FALSE },
-  { "ConvertUToF",                              saOp_ConvertUToF,                               4, SA_FALSE },
-  { "UConvert",                                 saOp_UConvert,                                  4, SA_FALSE },
-  { "SConvert",                                 saOp_SConvert,                                  4, SA_FALSE },
-  { "FConvert",                                 saOp_FConvert,                                  4, SA_FALSE },
-  { "QuantizeToF16",                            saOp_QuantizeToF16,                             4, SA_FALSE },
-  { "ConvertPtrToU",                            saOp_ConvertPtrToU,                             4, SA_FALSE },
-  { "SatConvertSToU",                           saOp_SatConvertSToU,                            4, SA_FALSE },
-  { "SatConvertUToS",                           saOp_SatConvertUToS,                            4, SA_FALSE },
-  { "ConvertUToPtr",                            saOp_ConvertUToPtr,                             4, SA_FALSE },
-  { "PtrCastToGeneric",                         saOp_PtrCastToGeneric,                          4, SA_FALSE },
-  { "GenericCastToPtr",                         saOp_GenericCastToPtr,                          4, SA_FALSE },
-  { "GenericCastToPtrExplicit",                 saOp_GenericCastToPtrExplicit,                  5, SA_FALSE },
-  { "Bitcast",                                  saOp_Bitcast,                                   4, SA_FALSE },
-  { "SNegate",                                  saOp_SNegate,                                   4, SA_FALSE },
-  { "FNegate",                                  saOp_FNegate,                                   4, SA_FALSE },
-  { "IAdd",                                     saOp_IAdd,                                      5, SA_FALSE },
-  { "FAdd",                                     saOp_FAdd,                                      5, SA_FALSE },
-  { "ISub",                                     saOp_ISub,                                      5, SA_FALSE },
-  { "FSub",                                     saOp_FSub,                                      5, SA_FALSE },
-  { "IMul",                                     saOp_IMul,                                      5, SA_FALSE },
-  { "FMul",                                     saOp_FMul,                                      5, SA_FALSE },
-  { "UDiv",                                     saOp_UDiv,                                      5, SA_FALSE },
-  { "SDiv",                                     saOp_SDiv,                                      5, SA_FALSE },
-  { "FDiv",                                     saOp_FDiv,                                      5, SA_FALSE },
-  { "UMul",                                     saOp_UMul,                                      5, SA_FALSE },
-  { "SRem",                                     saOp_SRem,                                      5, SA_FALSE },
-  { "SMod",                                     saOp_SMod,                                      5, SA_FALSE },
-  { "FRem",                                     saOp_FRem,                                      5, SA_FALSE },
-  { "FMod",                                     saOp_FMod,                                      5, SA_FALSE },
-  { "VectorTimesScalar",                        saOp_VectorTimesScalar,                         5, SA_FALSE },
-  { "MatrixTimesScalar",                        saOp_MatrixTimesScalar,                         5, SA_FALSE },
-  { "VectorTimesMatrix",                        saOp_VectorTimesMatrix,                         5, SA_FALSE },
-  { "MatrixTimesVector",                        saOp_MatrixTimesVector,                         5, SA_FALSE },
-  { "MatrixTimesMatrix",                        saOp_MatrixTimesMatrix,                         5, SA_FALSE },
-  { "OuterProduct",                             saOp_OuterProduct,                              5, SA_FALSE },
-  { "Dot",                                      saOp_Dot,                                       5, SA_FALSE },
-  { "IAddCarry",                                saOp_IAddCarry,                                 5, SA_FALSE },
-  { "ISubBorrow",                               saOp_ISubBorrow,                                5, SA_FALSE },
-  { "UMulExtended",                             saOp_UMulExtended,                              5, SA_FALSE },
-  { "SMulExtended",                             saOp_SMulExtended,                              5, SA_FALSE },
-  { "Any",                                      saOp_Any,                                       4, SA_FALSE },
-  { "All",                                      saOp_All,                                       4, SA_FALSE },
-  { "IsNan",                                    saOp_IsNan,                                     4, SA_FALSE },
-  { "IsInf",                                    saOp_IsInf,                                     4, SA_FALSE },
-  { "IsFinite",                                 saOp_IsFinite,                                  4, SA_FALSE },
-  { "IsNormal",                                 saOp_IsNormal,                                  4, SA_FALSE },
-  { "SignBitSet",                               saOp_SignBitSet,                                4, SA_FALSE },
-  { "LessOrGreater",                            saOp_LessOrGreater,                             5, SA_FALSE },
-  { "Ordered",                                  saOp_Ordered,                                   5, SA_FALSE },
-  { "Unordered",                                saOp_Unordered,                                 5, SA_FALSE },
-  { "LogicalEqual",                             saOp_LogicalEqual,                              5, SA_FALSE },
-  { "LogicalNotEqual",                          saOp_LogicalNotEqual,                           5, SA_FALSE },
-  { "LogicalOr",                                saOp_LogicalOr,                                 5, SA_FALSE },
-  { "LogicalAnd",                               saOp_LogicalAnd,                                5, SA_FALSE },
-  { "LogicalNot",                               saOp_LogicalNot,                                4, SA_FALSE },
-  { "Select",                                   saOp_Select,                                    6, SA_FALSE },
-  { "IEqual",                                   saOp_IEqual,                                    5, SA_FALSE },
-  { "INotEqual",                                saOp_INotEqual,                                 5, SA_FALSE },
-  { "UGreaterThan",                             saOp_UGreaterThan,                              5, SA_FALSE },
-  { "SGreaterThan",                             saOp_SGreaterThan,                              5, SA_FALSE },
-  { "UGreaterThanEqual",                        saOp_UGreaterThanEqual,                         5, SA_FALSE },
-  { "SGreaterThanEqual",                        saOp_SGreaterThanEqual,                         5, SA_FALSE },
-  { "ULessThan",                                saOp_ULessThan,                                 5, SA_FALSE },
-  { "SLessThan",                                saOp_SLessThan,                                 5, SA_FALSE },
-  { "ULessThanEqual",                           saOp_ULessThanEqual,                            5, SA_FALSE },
-  { "SLessThanEqual",                           saOp_SLessThanEqual,                            5, SA_FALSE },
-  { "FOrdEqual",                                saOp_FOrdEqual,                                 5, SA_FALSE },
-  { "FUnordEqual",                              saOp_FUnordEqual,                               5, SA_FALSE },
-  { "FOrdNotEqual",                             saOp_FOrdNotEqual,                              5, SA_FALSE },
-  { "FUnordNotEqual",                           saOp_FUnordNotEqual,                            5, SA_FALSE },
-  { "FOrdLessThan",                             saOp_FOrdLessThan,                              5, SA_FALSE },
-  { "FUnordLessThan",                           saOp_FUnordLessThan,                            5, SA_FALSE },
-  { "FOrdGreaterThan",                          saOp_FOrdGreaterThan,                           5, SA_FALSE },
-  { "FUnordGreaterThan",                        saOp_FUnordGreaterThan,                         5, SA_FALSE },
-  { "FOrdLessThanEqual",                        saOp_FOrdLessThanEqual,                         5, SA_FALSE },
-  { "FUnordLessThanEqual",                      saOp_FUnordLessThanEqual,                       5, SA_FALSE },
-  { "FOrdGreaterThanEqual",                     saOp_FOrdGreaterThanEqual,                      5, SA_FALSE },
-  { "FUnordGreaterThanEqual",                   saOp_FUnordGreaterThanEqual,                    5, SA_FALSE },
-  { "ShiftRightLogical",                        saOp_ShiftRightLogical,                         5, SA_FALSE },
-  { "ShiftRightArithmetic",                     saOp_ShiftRightArithmetic,                      5, SA_FALSE },
-  { "ShiftLeftLogical",                         saOp_ShiftLeftLogical,                          5, SA_FALSE },
-  { "BitwiseOr",                                saOp_BitwiseOr,                                 5, SA_FALSE },
-  { "BitwiseXor",                               saOp_BitwiseXor,                                5, SA_FALSE },
-  { "BitwiseAnd",                               saOp_BitwiseAnd,                                5, SA_FALSE },
-  { "Not",                                      saOp_Not,                                       4, SA_FALSE },
-  { "BitFieldInsert",                           saOp_BitFieldInsert,                            7, SA_FALSE },
-  { "BitFieldSExtract",                         saOp_BitFieldSExtract,                          6, SA_FALSE },
-  { "BitFieldUExtract",                         saOp_BitFieldUExtract,                          6, SA_FALSE },
-  { "BitReverse",                               saOp_BitReverse,                                4, SA_FALSE },
-  { "BitCount",                                 saOp_BitCount,                                  4, SA_FALSE },
-  { "DPdx",                                     saOp_DPdx,                                      4, SA_FALSE },
-  { "DPdy",                                     saOp_DPdy,                                      4, SA_FALSE },
-  { "Fwidth",                                   saOp_Fwidth,                                    4, SA_FALSE },
-  { "DPdxFine",                                 saOp_DPdxFine,                                  4, SA_FALSE },
-  { "DPdyFine",                                 saOp_DPdyFine,                                  4, SA_FALSE },
-  { "FwidthFine",                               saOp_FwidthFine,                                4, SA_FALSE },
-  { "DPdxCoarse",                               saOp_DPdxCoarse,                                4, SA_FALSE },
-  { "DPdyCoarse",                               saOp_DPdyCoarse,                                4, SA_FALSE },
-  { "FwidthCoarse",                             saOp_FwidthCoarse,                              4, SA_FALSE },
-  { "EmitVertex",                               saOp_EmitVertex,                                1, SA_FALSE },
-  { "EndPrimitive",                             saOp_EndPrimitive,                              1, SA_FALSE },
-  { "EmitStreamVertex",                         saOp_EmitStreamVertex,                          2, SA_FALSE },
-  { "EndStreamPrimitive",                       saOp_EndStreamPrimitive,                        2, SA_FALSE },
-  { "ControlBarrier",                           saOp_ControlBarrier,                            4, SA_FALSE },
-  { "MemoryBarrier",                            saOp_MemoryBarrier,                             3, SA_FALSE },
-  { "AtomicLoad",                               saOp_AtomicLoad,                                6, SA_FALSE },
-  { "AtomicStore",                              saOp_AtomicStore,                               5, SA_FALSE },
-  { "AtomicExchange",                           saOp_AtomicExchange,                            7, SA_FALSE },
-  { "AtomicCompareExchange",                    saOp_AtomicCompareExchange,                     9, SA_FALSE },
-  { "AtomicCompareExchangeWeak",                saOp_AtomicCompareExchangeWeak,                 9, SA_FALSE },
-  { "AtomicIIncrement",                         saOp_AtomicIIncrement,                          6, SA_FALSE },
-  { "AtomicIDecrement",                         saOp_AtomicIDecrement,                          6, SA_FALSE },
-  { "AtomicIAdd",                               saOp_AtomicIAdd,                                7, SA_FALSE },
-  { "AtomicISub",                               saOp_AtomicISub,                                7, SA_FALSE },
-  { "AtomicSMin",                               saOp_AtomicSMin,                                7, SA_FALSE },
-  { "AtomicUMin",                               saOp_AtomicUMin,                                7, SA_FALSE },
-  { "AtomicSMax",                               saOp_AtomicSMax,                                7, SA_FALSE },
-  { "AtomicUMax",                               saOp_AtomicUMax,                                7, SA_FALSE },
-  { "AtomicAnd",                                saOp_AtomicAnd,                                 7, SA_FALSE },
-  { "AtomicOr",                                 saOp_AtomicOr,                                  7, SA_FALSE },
-  { "AtomicXor",                                saOp_AtomicXor,                                 7, SA_FALSE },
-  { "Phi",                                      saOp_Phi,                                       3, SA_TRUE  },
-  { "LoopMerge",                                saOp_LoopMerge,                                 4, SA_TRUE  },
-  { "SelectionMerge",                           saOp_SelectionMerge,                            3, SA_FALSE },
-  { "Label",                                    saOp_Label,                                     2, SA_FALSE },
-  { "Branch",                                   saOp_Branch,                                    2, SA_FALSE },
-  { "BranchConditional",                        saOp_BranchConditional,                         4, SA_TRUE  },
-  { "Switch",                                   saOp_Switch,                                    3, SA_TRUE  },
-  { "Kill",                                     saOp_Kill,                                      1, SA_FALSE },
-  { "Return",                                   saOp_Return,                                    1, SA_FALSE },
-  { "ReturnValue",                              saOp_ReturnValue,                               2, SA_FALSE },
-  { "Unreachable",                              saOp_Unreachable,                               1, SA_FALSE },
-  { "LifetimeStart",                            saOp_LifetimeStart,                             3, SA_FALSE },
-  { "LifetimeStop",                             saOp_LifetimeStop,                              3, SA_FALSE },
-  { "GroupAsyncCopy",                           saOp_GroupAsyncCopy,                            9, SA_FALSE },
-  { "GroupWaitEvents",                          saOp_GroupWaitEvents,                           4, SA_FALSE },
-  { "GroupAll",                                 saOp_GroupAll,                                  5, SA_FALSE },
-  { "GroupAny",                                 saOp_GroupAny,                                  5, SA_FALSE },
-  { "GroupBroadcast",                           saOp_GroupBroadcast,                            6, SA_FALSE },
-  { "GroupIAdd",                                saOp_GroupIAdd,                                 6, SA_FALSE },
-  { "GroupFAdd",                                saOp_GroupFAdd,                                 6, SA_FALSE },
-  { "GroupFMin",                                saOp_GroupFMin,                                 6, SA_FALSE },
-  { "GroupUMin",                                saOp_GroupUMin,                                 6, SA_FALSE },
-  { "GroupSMin",                                saOp_GroupSMin,                                 6, SA_FALSE },
-  { "GroupFMax",                                saOp_GroupFMax,                                 6, SA_FALSE },
-  { "GroupUMax",                                saOp_GroupUMax,                                 6, SA_FALSE },
-  { "GroupSMax",                                saOp_GroupSMax,                                 6, SA_FALSE },
-  { "ReadPipe",                                 saOp_ReadPipe,                                  7, SA_FALSE },
-  { "WritePipe",                                saOp_WritePipe,                                 7, SA_FALSE },
-  { "ReservedReadPipe",                         saOp_ReservedReadPipe,                          9, SA_FALSE },
-  { "ReservedWritePipe",                        saOp_ReservedWritePipe,                         9, SA_FALSE },
-  { "ReservedReadPipePackets",                  saOp_ReservedReadPipePackets,                   7, SA_FALSE },
-  { "ReservedWritePipePackets",                 saOp_ReservedWritePipePackets,                  7, SA_FALSE },
-  { "CommitReadPipe",                           saOp_CommitReadPipe,                            5, SA_FALSE },
-  { "CommitWritePipe",                          saOp_CommitWritePipe,                           5, SA_FALSE },
-  { "IsValidReservedId",                        saOp_IsValidReservedId,                         4, SA_FALSE },
-  { "GetNumPipePackets",                        saOp_GetNumPipePackets,                         6, SA_FALSE },
-  { "GetMaxPipePackets",                        saOp_GetMaxPipePackets,                         6, SA_FALSE },
-  { "GroupReserveReadPipePackets",              saOp_GroupReserveReadPipePackets,               8, SA_FALSE },
-  { "GroupReserveWritePipePackets",             saOp_GroupReserveWritePipePackets,              8, SA_FALSE },
-  { "GroupCommitReadPipe",                      saOp_GroupCommitReadPipe,                       6, SA_FALSE },
-  { "GroupCommitWritePipe",                     saOp_GroupCommitWritePipe,                      6, SA_FALSE },
-  { "EnqueueMarker",                            saOp_EnqueueMarker,                             7, SA_FALSE },
-  { "EnqueueKernel",                            saOp_EnqueueKernel,                             13, SA_TRUE },
-  { "GetKernelINDrangeSubGroupCount",           saOp_GetKernelINDrangeSubGroupCount,            8, SA_FALSE },
-  { "GetKernelINDrangeMaxSubGroupSize",         saOp_GetKernelINDrangeMaxSubGroupSize,          8, SA_FALSE },
-  { "GetKernelIWorkGroupSize",                  saOp_GetKernelIWorkGroupSize,                   7, SA_FALSE },
-  { "GetKernelIPreferredWorkGroupSizeMultiple", saOp_GetKernelIPreferredWorkGroupSizeMultiple,  7, SA_FALSE },
-  { "RetainEvent",                              saOp_RetainEvent,                               2, SA_FALSE },
-  { "ReleaseEvent",                             saOp_ReleaseEvent,                              2, SA_FALSE },
-  { "CreateUserEvent",                          saOp_CreateUserEvent,                           3, SA_FALSE },
-  { "IsValidEvent",                             saOp_IsValidEvent,                              4, SA_FALSE },
-  { "SetUserEventStatus",                       saOp_SetUserEventStatus,                        3, SA_FALSE },
-  { "CaptureEventProfilingInfo",                saOp_CaptureEventProfilingInfo,                 4, SA_FALSE },
-  { "GetDefaultQueue",                          saOp_GetDefaultQueue,                           3, SA_FALSE },
-  { "BuildNDRange",                             saOp_BuildNDRange,                              6, SA_FALSE },
-  { "ImageSparseSampleImplicitLod",             saOp_ImageSparseSampleImplicitLod,              5, SA_TRUE  },
-  { "ImageSparseSampleExplicitLod",             saOp_ImageSparseSampleExplicitLod,              7, SA_TRUE  },
-  { "ImageSparseSampleDrefImplicitLod",         saOp_ImageSparseSampleDrefImplicitLod,          6, SA_TRUE  },
-  { "ImageSparseSampleDrefExplicitLod",         saOp_ImageSparseSampleDrefExplicitLod,          8, SA_TRUE  },
-  { "ImageSparseFetch",                         saOp_ImageSparseFetch,                          5, SA_TRUE  },
-  { "ImageSparseGather",                        saOp_ImageSparseGather,                         6, SA_TRUE  },
-  { "ImageSparseDrefGather",                    saOp_ImageSparseDrefGather,                     6, SA_TRUE  },
-  { "ImageSparseTexelResident",                 saOp_ImageSparseTexelResident,                  4, SA_FALSE },
-  { "NoLine",                                   saOp_NoLine,                                    1, SA_FALSE },
-  { "AtomicFlagTestAndSet",                     saOp_AtomicFlagTestAndSet,                      6, SA_FALSE },
-  { "AtomicFlagClear",                          saOp_AtomicFlagClear,                           4, SA_FALSE },
-  { "ImageSparseRead",                          saOp_ImageSparseRead,                           5, SA_TRUE  },
-  { "SizeOf",                                   saOp_SizeOf,                                    4, SA_FALSE },
-  { "TypePipeStorage",                          saOp_TypePipeStorage,                           2, SA_FALSE },
-  { "ConstantPipeStorage",                      saOp_ConstantPipeStorage,                       6, SA_FALSE },
-  { "CreatePipeFromPipeStorage",                saOp_CreatePipeFromPipeStorage,                 4, SA_FALSE },
-  { "GetKernelLocalSizeForSubgroupCount",       saOp_GetKernelLocalSizeForSubgroupCount,        8, SA_FALSE },
-  { "GetKernelMaxNumSubgroups",                 saOp_GetKernelMaxNumSubgroups,                  7, SA_FALSE },
-  { "TypeNamedBarrier",                         saOp_TypeNamedBarrier,                          2, SA_FALSE },
-  { "NamedBarrierInitialize",                   saOp_NamedBarrierInitialize,                    4, SA_FALSE },
-  { "MemoryNamedBarrier",                       saOp_MemoryNamedBarrier,                        4, SA_FALSE },
-  { "ModuleProcessed",                          saOp_ModuleProcessed,                           2, SA_TRUE  },
-  { "ExecutionModeId",                          saOp_ExecutionModeId,                           5, SA_TRUE  },
-  { "DecorateId",                               saOp_DecorateId,                                3, SA_TRUE  },
-  { "GroupNonUniformElect",                     saOp_GroupNonUniformElect,                      4, SA_FALSE },
-  { "GroupNonUniformAll",                       saOp_GroupNonUniformAll,                        5, SA_FALSE },
-  { "GroupNonUniformAny",                       saOp_GroupNonUniformAny,                        5, SA_FALSE },
-  { "GroupNonUniformAllEqual",                  saOp_GroupNonUniformAllEqual,                   5, SA_FALSE },
-  { "GroupNonUniformBroadcast",                 saOp_GroupNonUniformBroadcast,                  6, SA_FALSE },
-  { "GroupNonUniformBroadcastFirst",            saOp_GroupNonUniformBroadcastFirst,             5, SA_FALSE },
-  { "GroupNonUniformBallot",                    saOp_GroupNonUniformBallot,                     5, SA_FALSE },
-  { "GroupNonUniformInverseBallot",             saOp_GroupNonUniformInverseBallot,              5, SA_FALSE },
-  { "GroupNonUniformBallotBitExtract",          saOp_GroupNonUniformBallotBitExtract,           6, SA_FALSE },
-  { "GroupNonUniformBallotBitCount",            saOp_GroupNonUniformBallotBitCount,             6, SA_FALSE },
-  { "GroupNonUniformBallotFindLSB",             saOp_GroupNonUniformBallotFindLSB,              5, SA_FALSE },
-  { "GroupNonUniformBallotFindMSB",             saOp_GroupNonUniformBallotFindMSB,              5, SA_FALSE },
-  { "GroupNonUniformShuffle",                   saOp_GroupNonUniformShuffle,                    6, SA_FALSE },
-  { "GroupNonUniformShuffleXor",                saOp_GroupNonUniformShuffleXor,                 6, SA_FALSE },
-  { "GroupNonUniformShuffleUp",                 saOp_GroupNonUniformShuffleUp,                  6, SA_FALSE },
-  { "GroupNonUniformShuffleDown",               saOp_GroupNonUniformShuffleDown,                6, SA_FALSE },
-  { "GroupNonUniformIAdd",                      saOp_GroupNonUniformIAdd,                       6, SA_TRUE  },
-  { "GroupNonUniformFAdd",                      saOp_GroupNonUniformFAdd,                       6, SA_TRUE  },
-  { "GroupNonUniformIMul",                      saOp_GroupNonUniformIMul,                       6, SA_TRUE  },
-  { "GroupNonUniformFMul",                      saOp_GroupNonUniformFMul,                       6, SA_TRUE  },
-  { "GroupNonUniformSMin",                      saOp_GroupNonUniformSMin,                       6, SA_TRUE  },
-  { "GroupNonUniformUMin",                      saOp_GroupNonUniformUMin,                       6, SA_TRUE  },
-  { "GroupNonUniformFMin",                      saOp_GroupNonUniformFMin,                       6, SA_TRUE  },
-  { "GroupNonUniformSMax",                      saOp_GroupNonUniformSMax,                       6, SA_TRUE  },
-  { "GroupNonUniformUMax",                      saOp_GroupNonUniformUMax,                       6, SA_TRUE  },
-  { "GroupNonUniformFMax",                      saOp_GroupNonUniformFMax,                       6, SA_TRUE  },
-  { "GroupNonUniformBitwiseAnd",                saOp_GroupNonUniformBitwiseAnd,                 6, SA_TRUE  },
-  { "GroupNonUniformBitwiseOr",                 saOp_GroupNonUniformBitwiseOr,                  6, SA_TRUE  },
-  { "GroupNonUniformBitwiseXor",                saOp_GroupNonUniformBitwiseXor,                 6, SA_TRUE  },
-  { "GroupNonUniformLogicalAnd",                saOp_GroupNonUniformLogicalAnd,                 6, SA_TRUE  },
-  { "GroupNonUniformLogicalOr",                 saOp_GroupNonUniformLogicalOr,                  6, SA_TRUE  },
-  { "GroupNonUniformLogicalXor",                saOp_GroupNonUniformLogicalXor,                 6, SA_TRUE  },
-  { "GroupNonUniformQuadBroadcast",             saOp_GroupNonUniformQuadBroadcast,              6, SA_FALSE },
-  { "GroupNonUniformQuadSwap",                  saOp_GroupNonUniformQuadSwap,                   6, SA_FALSE },
-  { "CopyLogical",                              saOp_CopyLogical,                               4, SA_FALSE },
-  { "PtrEqual",                                 saOp_PtrEqual,                                  5, SA_FALSE },
-  { "PtrNotEqual",                              saOp_PtrNotEqual,                               5, SA_FALSE },
-  { "PtrDiff",                                  saOp_PtrDiff,                                   5, SA_FALSE }
+  { "Nop",                                      saOp_Nop,                                       1, SA_FALSE, { SA_UINT32_MAX } },
+  { "Undef",                                    saOp_Undef,                                     3, SA_FALSE, { SA_UINT32_MAX } },
+  { "SourceContinued",                          saOp_SourceContinued,                           2, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Source",                                   saOp_Source,                                    3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "SourceExtension",                          saOp_SourceExtension,                           2, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Name",                                     saOp_Name,                                      3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "MemberName",                               saOp_MemberName,                                4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "String",                                   saOp_String,                                    3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Line",                                     saOp_Line,                                      4, SA_FALSE, { SA_UINT32_MAX } },
+  { "Extension",                                saOp_Extension,                                 2, SA_TRUE,  { SA_UINT32_MAX } },
+  { "ExtInstImport",                            saOp_ExtInstImport,                             3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "ExtInst",                                  saOp_ExtInst,                                   5, SA_TRUE,  { SA_UINT32_MAX } },
+  { "MemoryModel",                              saOp_MemoryModel,                               3, SA_FALSE, { SA_UINT32_MAX } },
+  { "EntryPoint",                               saOp_EntryPoint,                                4, SA_TRUE,  { saAsmEnum_EntryPoint, SA_UINT32_MAX } },
+  { "ExecutionMode",                            saOp_ExecutionMode,                             3, SA_TRUE,  { saAsmEnum_ExecutionMode, SA_UINT32_MAX /*XXX: Possibly execution mode later*/ } },
+  { "Capability",                               saOp_Capability,                                2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeVoid",                                 saOp_TypeVoid,                                  2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeBool",                                 saOp_TypeBool,                                  2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeInt",                                  saOp_TypeInt,                                   4, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeFloat",                                saOp_TypeFloat,                                 3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "TypeVector",                               saOp_TypeVector,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeMatrix",                               saOp_TypeMatrix,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeImage",                                saOp_TypeImage,                                 9, SA_TRUE,  { saAsmEnum_ImageFormat, saAsmEnum_ImageDimmension, saAsmEnum_AccessQualifier, SA_UINT32_MAX } },
+  { "TypeSampler",                              saOp_TypeSampler,                               2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeSampledImage",                         saOp_TypeSampledImage,                          3, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeArray",                                saOp_TypeArray,                                 4, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeRuntimeArray",                         saOp_TypeRuntimeArray,                          3, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeStruct",                               saOp_TypeStruct,                                2, SA_TRUE,  { SA_UINT32_MAX } },
+  { "TypeOpaque",                               saOp_TypeOpaque,                                3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "TypePointer",                              saOp_TypePointer,                               4, SA_FALSE, { saAsmEnum_StorageClass, SA_UINT32_MAX } },
+  { "TypeFunction",                             saOp_TypeFunction,                              3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "TypeEvent",                                saOp_TypeEvent,                                 2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeDeviceEvent",                          saOp_TypeDeviceEvent,                           2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeReserveId",                            saOp_TypeReserveId,                             2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeQueue",                                saOp_TypeQueue,                                 2, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypePipe",                                 saOp_TypePipe,                                  3, SA_FALSE, { saAsmEnum_AccessQualifier, SA_UINT32_MAX } },
+  { "TypeForwardPointer",                       saOp_TypeForwardPointer,                        3, SA_FALSE, { saAsmEnum_StorageClass, SA_UINT32_MAX } },
+  { "ConstantTrue",                             saOp_ConstantTrue,                              3, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConstantFalse",                            saOp_ConstantFalse,                             3, SA_FALSE, { SA_UINT32_MAX } },
+  { "Constant",                                 saOp_Constant,                                  4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "ConstantComposite",                        saOp_ConstantComposite,                         3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "ConstantSampler",                          saOp_ConstantSampler,                           6, SA_FALSE, { saAsmEnum_SamplerAddressingMode, saAsmEnum_SamplerFilterMode, SA_UINT32_MAX } },
+  { "ConstantNull",                             saOp_ConstantNull,                              3, SA_FALSE, { SA_UINT32_MAX } },
+  { "SpecConstantTrue",                         saOp_SpecConstantTrue,                          3, SA_FALSE, { SA_UINT32_MAX } },
+  { "SpecConstantFalse",                        saOp_SpecConstantFalse,                         3, SA_FALSE, { SA_UINT32_MAX } },
+  { "SpecConstant",                             saOp_SpecConstant,                              4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "SpecConstantComposite",                    saOp_SpecConstantComposite,                     3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "SpecConstantOp",                           saOp_SpecConstantOp,                            4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Function",                                 saOp_Function,                                  5, SA_FALSE, { saAsmEnum_FunctionControl, SA_UINT32_MAX } },
+  { "FunctionParameter",                        saOp_FunctionParameter,                         3, SA_FALSE, { SA_UINT32_MAX } },
+  { "FunctionEnd",                              saOp_FunctionEnd,                               1, SA_FALSE, { SA_UINT32_MAX } },
+  { "FunctionCall",                             saOp_FunctionCall,                              4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Variable",                                 saOp_Variable,                                  4, SA_TRUE,  { saAsmEnum_StorageClass, SA_UINT32_MAX } },
+  { "ImageTexelPointer",                        saOp_ImageTexelPointer,                         6, SA_FALSE, { SA_UINT32_MAX } },
+  { "Load",                                     saOp_Load,                                      4, SA_TRUE,  { saAsmEnum_MemoryOperand, SA_UINT32_MAX } },
+  { "Store",                                    saOp_Store,                                     3, SA_TRUE,  { saAsmEnum_MemoryOperand, SA_UINT32_MAX } },
+  { "CopyMemory",                               saOp_CopyMemory,                                3, SA_TRUE,  { saAsmEnum_MemoryOperand, SA_UINT32_MAX } },
+  { "CopyMemorySized",                          saOp_CopyMemorySized,                           4, SA_TRUE,  { saAsmEnum_MemoryOperand, SA_UINT32_MAX } },
+  { "AccessChain",                              saOp_AccessChain,                               4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "InBoundsAccessChain",                      saOp_InBoundsAccessChain,                       4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "PtrAccessChain",                           saOp_PtrAccessChain,                            5, SA_TRUE,  { SA_UINT32_MAX } },
+  { "ArrayLength",                              saOp_ArrayLength,                               5, SA_FALSE, { SA_UINT32_MAX } },
+  { "GenericPtrMemSemantics",                   saOp_GenericPtrMemSemantics,                    4, SA_FALSE, { SA_UINT32_MAX } },
+  { "InBoundsPtrAccessChain",                   saOp_InBoundsPtrAccessChain,                    5, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Decorate",                                 saOp_Decorate,                                  3, SA_TRUE,  { saAsmEnum_Decoration, saAsmEnum_DecorationBuiltIn, SA_UINT32_MAX } },
+  { "MemberDecorate",                           saOp_MemberDecorate,                            4, SA_TRUE,  { saAsmEnum_Decoration, saAsmEnum_DecorationBuiltIn, SA_UINT32_MAX } },
+  { "DecorationGroup",                          saOp_DecorationGroup,                           2, SA_FALSE, { SA_UINT32_MAX } },
+  { "GroupDecorate",                            saOp_GroupDecorate,                             2, SA_TRUE,  { SA_UINT32_MAX } },
+  { "GroupMemberDecorate",                      saOp_GroupMemberDecorate,                       2, SA_TRUE,  { SA_UINT32_MAX } },
+  { "VectorExtractDynamic",                     saOp_VectorExtractDynamic,                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "VectorInsertDynamic",                      saOp_VectorInsertDynamic,                       6, SA_FALSE, { SA_UINT32_MAX } },
+  { "VectorShuffle",                            saOp_VectorShuffle,                             5, SA_TRUE,  { SA_UINT32_MAX } },
+  { "CompositeConstruct",                       saOp_CompositeConstruct,                        3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "CompositeExtract",                         saOp_CompositeExtract,                          4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "CompositeInsert",                          saOp_CompositeInsert,                           5, SA_TRUE,  { SA_UINT32_MAX } },
+  { "CopyObject",                               saOp_CopyObject,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "Transpose",                                saOp_Transpose,                                 4, SA_FALSE, { SA_UINT32_MAX } },
+  { "SampledImage",                             saOp_SampledImage,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageSampleImplicitLod",                   saOp_ImageSampleImplicitLod,                    5, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSampleExplicitLod",                   saOp_ImageSampleExplicitLod,                    7, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSampleDrefImplicitLod",               saOp_ImageSampleDrefImplicitLod,                6, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSampleDrefExplicitLod",               saOp_ImageSampleDrefExplicitLod,                8, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSampleProjImplicitLod",               saOp_ImageSampleProjImplicitLod,                5, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSampleProjExplicitLod",               saOp_ImageSampleProjExplicitLod,                7, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSampleProjDrefImplicitLod",           saOp_ImageSampleProjDrefImplicitLod,            6, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSampleProjDrefExplicitLod",           saOp_ImageSampleProjDrefExplicitLod,            8, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageFetch",                               saOp_ImageFetch,                                5, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageGather",                              saOp_ImageGather,                               6, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageDrefGather",                          saOp_ImageDrefGather,                           6, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageRead",                                saOp_ImageRead,                                 5, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageWrite",                               saOp_ImageWrite,                                4, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "Image",                                    saOp_Image,                                     4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageQueryFormat",                         saOp_ImageQueryFormat,                          4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageQueryOrder",                          saOp_ImageQueryOrder,                           4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageQuerySizeLod",                        saOp_ImageQuerySizeLod,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageQuerySize",                           saOp_ImageQuerySize,                            4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageQueryLod",                            saOp_ImageQueryLod,                             5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageQueryLevels",                         saOp_ImageQueryLevels,                          4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageQuerySamples",                        saOp_ImageQuerySamples,                         4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConvertFToU",                              saOp_ConvertFToU,                               4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConvertFToS",                              saOp_ConvertFToS,                               4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConvertSToF",                              saOp_ConvertSToF,                               4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConvertUToF",                              saOp_ConvertUToF,                               4, SA_FALSE, { SA_UINT32_MAX } },
+  { "UConvert",                                 saOp_UConvert,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "SConvert",                                 saOp_SConvert,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "FConvert",                                 saOp_FConvert,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "QuantizeToF16",                            saOp_QuantizeToF16,                             4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConvertPtrToU",                            saOp_ConvertPtrToU,                             4, SA_FALSE, { SA_UINT32_MAX } },
+  { "SatConvertSToU",                           saOp_SatConvertSToU,                            4, SA_FALSE, { SA_UINT32_MAX } },
+  { "SatConvertUToS",                           saOp_SatConvertUToS,                            4, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConvertUToPtr",                            saOp_ConvertUToPtr,                             4, SA_FALSE, { SA_UINT32_MAX } },
+  { "PtrCastToGeneric",                         saOp_PtrCastToGeneric,                          4, SA_FALSE, { SA_UINT32_MAX } },
+  { "GenericCastToPtr",                         saOp_GenericCastToPtr,                          4, SA_FALSE, { SA_UINT32_MAX } },
+  { "GenericCastToPtrExplicit",                 saOp_GenericCastToPtrExplicit,                  5, SA_FALSE, { saAsmEnum_StorageClass, SA_UINT32_MAX } },
+  { "Bitcast",                                  saOp_Bitcast,                                   4, SA_FALSE, { SA_UINT32_MAX } },
+  { "SNegate",                                  saOp_SNegate,                                   4, SA_FALSE, { SA_UINT32_MAX } },
+  { "FNegate",                                  saOp_FNegate,                                   4, SA_FALSE, { SA_UINT32_MAX } },
+  { "IAdd",                                     saOp_IAdd,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FAdd",                                     saOp_FAdd,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ISub",                                     saOp_ISub,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FSub",                                     saOp_FSub,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "IMul",                                     saOp_IMul,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FMul",                                     saOp_FMul,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "UDiv",                                     saOp_UDiv,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SDiv",                                     saOp_SDiv,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FDiv",                                     saOp_FDiv,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "UMul",                                     saOp_UMul,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SRem",                                     saOp_SRem,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SMod",                                     saOp_SMod,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FRem",                                     saOp_FRem,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FMod",                                     saOp_FMod,                                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "VectorTimesScalar",                        saOp_VectorTimesScalar,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "MatrixTimesScalar",                        saOp_MatrixTimesScalar,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "VectorTimesMatrix",                        saOp_VectorTimesMatrix,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "MatrixTimesVector",                        saOp_MatrixTimesVector,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "MatrixTimesMatrix",                        saOp_MatrixTimesMatrix,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "OuterProduct",                             saOp_OuterProduct,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "Dot",                                      saOp_Dot,                                       5, SA_FALSE, { SA_UINT32_MAX } },
+  { "IAddCarry",                                saOp_IAddCarry,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ISubBorrow",                               saOp_ISubBorrow,                                5, SA_FALSE, { SA_UINT32_MAX } },
+  { "UMulExtended",                             saOp_UMulExtended,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SMulExtended",                             saOp_SMulExtended,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "Any",                                      saOp_Any,                                       4, SA_FALSE, { SA_UINT32_MAX } },
+  { "All",                                      saOp_All,                                       4, SA_FALSE, { SA_UINT32_MAX } },
+  { "IsNan",                                    saOp_IsNan,                                     4, SA_FALSE, { SA_UINT32_MAX } },
+  { "IsInf",                                    saOp_IsInf,                                     4, SA_FALSE, { SA_UINT32_MAX } },
+  { "IsFinite",                                 saOp_IsFinite,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "IsNormal",                                 saOp_IsNormal,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "SignBitSet",                               saOp_SignBitSet,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "LessOrGreater",                            saOp_LessOrGreater,                             5, SA_FALSE, { SA_UINT32_MAX } },
+  { "Ordered",                                  saOp_Ordered,                                   5, SA_FALSE, { SA_UINT32_MAX } },
+  { "Unordered",                                saOp_Unordered,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "LogicalEqual",                             saOp_LogicalEqual,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "LogicalNotEqual",                          saOp_LogicalNotEqual,                           5, SA_FALSE, { SA_UINT32_MAX } },
+  { "LogicalOr",                                saOp_LogicalOr,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "LogicalAnd",                               saOp_LogicalAnd,                                5, SA_FALSE, { SA_UINT32_MAX } },
+  { "LogicalNot",                               saOp_LogicalNot,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "Select",                                   saOp_Select,                                    6, SA_FALSE, { SA_UINT32_MAX } },
+  { "IEqual",                                   saOp_IEqual,                                    5, SA_FALSE, { SA_UINT32_MAX } },
+  { "INotEqual",                                saOp_INotEqual,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "UGreaterThan",                             saOp_UGreaterThan,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SGreaterThan",                             saOp_SGreaterThan,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "UGreaterThanEqual",                        saOp_UGreaterThanEqual,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SGreaterThanEqual",                        saOp_SGreaterThanEqual,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ULessThan",                                saOp_ULessThan,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SLessThan",                                saOp_SLessThan,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ULessThanEqual",                           saOp_ULessThanEqual,                            5, SA_FALSE, { SA_UINT32_MAX } },
+  { "SLessThanEqual",                           saOp_SLessThanEqual,                            5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FOrdEqual",                                saOp_FOrdEqual,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FUnordEqual",                              saOp_FUnordEqual,                               5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FOrdNotEqual",                             saOp_FOrdNotEqual,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FUnordNotEqual",                           saOp_FUnordNotEqual,                            5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FOrdLessThan",                             saOp_FOrdLessThan,                              5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FUnordLessThan",                           saOp_FUnordLessThan,                            5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FOrdGreaterThan",                          saOp_FOrdGreaterThan,                           5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FUnordGreaterThan",                        saOp_FUnordGreaterThan,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FOrdLessThanEqual",                        saOp_FOrdLessThanEqual,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FUnordLessThanEqual",                      saOp_FUnordLessThanEqual,                       5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FOrdGreaterThanEqual",                     saOp_FOrdGreaterThanEqual,                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "FUnordGreaterThanEqual",                   saOp_FUnordGreaterThanEqual,                    5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ShiftRightLogical",                        saOp_ShiftRightLogical,                         5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ShiftRightArithmetic",                     saOp_ShiftRightArithmetic,                      5, SA_FALSE, { SA_UINT32_MAX } },
+  { "ShiftLeftLogical",                         saOp_ShiftLeftLogical,                          5, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitwiseOr",                                saOp_BitwiseOr,                                 5, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitwiseXor",                               saOp_BitwiseXor,                                5, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitwiseAnd",                               saOp_BitwiseAnd,                                5, SA_FALSE, { SA_UINT32_MAX } },
+  { "Not",                                      saOp_Not,                                       4, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitFieldInsert",                           saOp_BitFieldInsert,                            7, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitFieldSExtract",                         saOp_BitFieldSExtract,                          6, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitFieldUExtract",                         saOp_BitFieldUExtract,                          6, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitReverse",                               saOp_BitReverse,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "BitCount",                                 saOp_BitCount,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "DPdx",                                     saOp_DPdx,                                      4, SA_FALSE, { SA_UINT32_MAX } },
+  { "DPdy",                                     saOp_DPdy,                                      4, SA_FALSE, { SA_UINT32_MAX } },
+  { "Fwidth",                                   saOp_Fwidth,                                    4, SA_FALSE, { SA_UINT32_MAX } },
+  { "DPdxFine",                                 saOp_DPdxFine,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "DPdyFine",                                 saOp_DPdyFine,                                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "FwidthFine",                               saOp_FwidthFine,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "DPdxCoarse",                               saOp_DPdxCoarse,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "DPdyCoarse",                               saOp_DPdyCoarse,                                4, SA_FALSE, { SA_UINT32_MAX } },
+  { "FwidthCoarse",                             saOp_FwidthCoarse,                              4, SA_FALSE, { SA_UINT32_MAX } },
+  { "EmitVertex",                               saOp_EmitVertex,                                1, SA_FALSE, { SA_UINT32_MAX } },
+  { "EndPrimitive",                             saOp_EndPrimitive,                              1, SA_FALSE, { SA_UINT32_MAX } },
+  { "EmitStreamVertex",                         saOp_EmitStreamVertex,                          2, SA_FALSE, { SA_UINT32_MAX } },
+  { "EndStreamPrimitive",                       saOp_EndStreamPrimitive,                        2, SA_FALSE, { SA_UINT32_MAX } },
+  { "ControlBarrier",                           saOp_ControlBarrier,                            4, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "MemoryBarrier",                            saOp_MemoryBarrier,                             3, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicLoad",                               saOp_AtomicLoad,                                6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicStore",                              saOp_AtomicStore,                               5, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicExchange",                           saOp_AtomicExchange,                            7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicCompareExchange",                    saOp_AtomicCompareExchange,                     9, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicCompareExchangeWeak",                saOp_AtomicCompareExchangeWeak,                 9, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicIIncrement",                         saOp_AtomicIIncrement,                          6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicIDecrement",                         saOp_AtomicIDecrement,                          6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicIAdd",                               saOp_AtomicIAdd,                                7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicISub",                               saOp_AtomicISub,                                7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicSMin",                               saOp_AtomicSMin,                                7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicUMin",                               saOp_AtomicUMin,                                7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicSMax",                               saOp_AtomicSMax,                                7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicUMax",                               saOp_AtomicUMax,                                7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicAnd",                                saOp_AtomicAnd,                                 7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicOr",                                 saOp_AtomicOr,                                  7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicXor",                                saOp_AtomicXor,                                 7, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "Phi",                                      saOp_Phi,                                       3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "LoopMerge",                                saOp_LoopMerge,                                 4, SA_TRUE,  { saAsmEnum_LoopControl, SA_UINT32_MAX } },
+  { "SelectionMerge",                           saOp_SelectionMerge,                            3, SA_FALSE, { saAsmEnum_SelectionControl, SA_UINT32_MAX } },
+  { "Label",                                    saOp_Label,                                     2, SA_FALSE, { SA_UINT32_MAX } },
+  { "Branch",                                   saOp_Branch,                                    2, SA_FALSE, { SA_UINT32_MAX } },
+  { "BranchConditional",                        saOp_BranchConditional,                         4, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Switch",                                   saOp_Switch,                                    3, SA_TRUE,  { SA_UINT32_MAX } },
+  { "Kill",                                     saOp_Kill,                                      1, SA_FALSE, { SA_UINT32_MAX } },
+  { "Return",                                   saOp_Return,                                    1, SA_FALSE, { SA_UINT32_MAX } },
+  { "ReturnValue",                              saOp_ReturnValue,                               2, SA_FALSE, { SA_UINT32_MAX } },
+  { "Unreachable",                              saOp_Unreachable,                               1, SA_FALSE, { SA_UINT32_MAX } },
+  { "LifetimeStart",                            saOp_LifetimeStart,                             3, SA_FALSE, { SA_UINT32_MAX } },
+  { "LifetimeStop",                             saOp_LifetimeStop,                              3, SA_FALSE, { SA_UINT32_MAX } },
+  { "GroupAsyncCopy",                           saOp_GroupAsyncCopy,                            9, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupWaitEvents",                          saOp_GroupWaitEvents,                           4, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupAll",                                 saOp_GroupAll,                                  5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupAny",                                 saOp_GroupAny,                                  5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupBroadcast",                           saOp_GroupBroadcast,                            6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupIAdd",                                saOp_GroupIAdd,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupFAdd",                                saOp_GroupFAdd,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupFMin",                                saOp_GroupFMin,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupUMin",                                saOp_GroupUMin,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupSMin",                                saOp_GroupSMin,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupFMax",                                saOp_GroupFMax,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupUMax",                                saOp_GroupUMax,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupSMax",                                saOp_GroupSMax,                                 6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "ReadPipe",                                 saOp_ReadPipe,                                  7, SA_FALSE, { SA_UINT32_MAX } },
+  { "WritePipe",                                saOp_WritePipe,                                 7, SA_FALSE, { SA_UINT32_MAX } },
+  { "ReservedReadPipe",                         saOp_ReservedReadPipe,                          9, SA_FALSE, { SA_UINT32_MAX } },
+  { "ReservedWritePipe",                        saOp_ReservedWritePipe,                         9, SA_FALSE, { SA_UINT32_MAX } },
+  { "ReservedReadPipePackets",                  saOp_ReservedReadPipePackets,                   7, SA_FALSE, { SA_UINT32_MAX } },
+  { "ReservedWritePipePackets",                 saOp_ReservedWritePipePackets,                  7, SA_FALSE, { SA_UINT32_MAX } },
+  { "CommitReadPipe",                           saOp_CommitReadPipe,                            5, SA_FALSE, { SA_UINT32_MAX } },
+  { "CommitWritePipe",                          saOp_CommitWritePipe,                           5, SA_FALSE, { SA_UINT32_MAX } },
+  { "IsValidReservedId",                        saOp_IsValidReservedId,                         4, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetNumPipePackets",                        saOp_GetNumPipePackets,                         6, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetMaxPipePackets",                        saOp_GetMaxPipePackets,                         6, SA_FALSE, { SA_UINT32_MAX } },
+  { "GroupReserveReadPipePackets",              saOp_GroupReserveReadPipePackets,               8, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupReserveWritePipePackets",             saOp_GroupReserveWritePipePackets,              8, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupCommitReadPipe",                      saOp_GroupCommitReadPipe,                       6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupCommitWritePipe",                     saOp_GroupCommitWritePipe,                      6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "EnqueueMarker",                            saOp_EnqueueMarker,                             7, SA_FALSE, { SA_UINT32_MAX } },
+  { "EnqueueKernel",                            saOp_EnqueueKernel,                             13, SA_TRUE, { SA_UINT32_MAX } },
+  { "GetKernelINDrangeSubGroupCount",           saOp_GetKernelINDrangeSubGroupCount,            8, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetKernelINDrangeMaxSubGroupSize",         saOp_GetKernelINDrangeMaxSubGroupSize,          8, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetKernelIWorkGroupSize",                  saOp_GetKernelIWorkGroupSize,                   7, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetKernelIPreferredWorkGroupSizeMultiple", saOp_GetKernelIPreferredWorkGroupSizeMultiple,  7, SA_FALSE, { SA_UINT32_MAX } },
+  { "RetainEvent",                              saOp_RetainEvent,                               2, SA_FALSE, { SA_UINT32_MAX } },
+  { "ReleaseEvent",                             saOp_ReleaseEvent,                              2, SA_FALSE, { SA_UINT32_MAX } },
+  { "CreateUserEvent",                          saOp_CreateUserEvent,                           3, SA_FALSE, { SA_UINT32_MAX } },
+  { "IsValidEvent",                             saOp_IsValidEvent,                              4, SA_FALSE, { SA_UINT32_MAX } },
+  { "SetUserEventStatus",                       saOp_SetUserEventStatus,                        3, SA_FALSE, { SA_UINT32_MAX } },
+  { "CaptureEventProfilingInfo",                saOp_CaptureEventProfilingInfo,                 4, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetDefaultQueue",                          saOp_GetDefaultQueue,                           3, SA_FALSE, { SA_UINT32_MAX } },
+  { "BuildNDRange",                             saOp_BuildNDRange,                              6, SA_FALSE, { SA_UINT32_MAX } },
+  { "ImageSparseSampleImplicitLod",             saOp_ImageSparseSampleImplicitLod,              5, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSparseSampleExplicitLod",             saOp_ImageSparseSampleExplicitLod,              7, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSparseSampleDrefImplicitLod",         saOp_ImageSparseSampleDrefImplicitLod,          6, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSparseSampleDrefExplicitLod",         saOp_ImageSparseSampleDrefExplicitLod,          8, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSparseFetch",                         saOp_ImageSparseFetch,                          5, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSparseGather",                        saOp_ImageSparseGather,                         6, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSparseDrefGather",                    saOp_ImageSparseDrefGather,                     6, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "ImageSparseTexelResident",                 saOp_ImageSparseTexelResident,                  4, SA_FALSE, { SA_UINT32_MAX } },
+  { "NoLine",                                   saOp_NoLine,                                    1, SA_FALSE, { SA_UINT32_MAX } },
+  { "AtomicFlagTestAndSet",                     saOp_AtomicFlagTestAndSet,                      6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "AtomicFlagClear",                          saOp_AtomicFlagClear,                           4, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "ImageSparseRead",                          saOp_ImageSparseRead,                           5, SA_TRUE,  { saAsmEnum_ImageOperand, SA_UINT32_MAX } },
+  { "SizeOf",                                   saOp_SizeOf,                                    4, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypePipeStorage",                          saOp_TypePipeStorage,                           2, SA_FALSE, { SA_UINT32_MAX } },
+  { "ConstantPipeStorage",                      saOp_ConstantPipeStorage,                       6, SA_FALSE, { SA_UINT32_MAX } },
+  { "CreatePipeFromPipeStorage",                saOp_CreatePipeFromPipeStorage,                 4, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetKernelLocalSizeForSubgroupCount",       saOp_GetKernelLocalSizeForSubgroupCount,        8, SA_FALSE, { SA_UINT32_MAX } },
+  { "GetKernelMaxNumSubgroups",                 saOp_GetKernelMaxNumSubgroups,                  7, SA_FALSE, { SA_UINT32_MAX } },
+  { "TypeNamedBarrier",                         saOp_TypeNamedBarrier,                          2, SA_FALSE, { SA_UINT32_MAX } },
+  { "NamedBarrierInitialize",                   saOp_NamedBarrierInitialize,                    4, SA_FALSE, { SA_UINT32_MAX } },
+  { "MemoryNamedBarrier",                       saOp_MemoryNamedBarrier,                        4, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
+  { "ModuleProcessed",                          saOp_ModuleProcessed,                           2, SA_TRUE,  { SA_UINT32_MAX } },
+  { "ExecutionModeId",                          saOp_ExecutionModeId,                           5, SA_TRUE,  { SA_UINT32_MAX /*XXX: Possibly execution mode later*/} },
+  { "DecorateId",                               saOp_DecorateId,                                3, SA_TRUE,  { saAsmEnum_Decoration, saAsmEnum_DecorationBuiltIn, SA_UINT32_MAX } },
+  { "GroupNonUniformElect",                     saOp_GroupNonUniformElect,                      4, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformAll",                       saOp_GroupNonUniformAll,                        5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformAny",                       saOp_GroupNonUniformAny,                        5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformAllEqual",                  saOp_GroupNonUniformAllEqual,                   5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformBroadcast",                 saOp_GroupNonUniformBroadcast,                  6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformBroadcastFirst",            saOp_GroupNonUniformBroadcastFirst,             5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformBallot",                    saOp_GroupNonUniformBallot,                     5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformInverseBallot",             saOp_GroupNonUniformInverseBallot,              5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformBallotBitExtract",          saOp_GroupNonUniformBallotBitExtract,           6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformBallotBitCount",            saOp_GroupNonUniformBallotBitCount,             6, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformBallotFindLSB",             saOp_GroupNonUniformBallotFindLSB,              5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformBallotFindMSB",             saOp_GroupNonUniformBallotFindMSB,              5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformShuffle",                   saOp_GroupNonUniformShuffle,                    6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformShuffleXor",                saOp_GroupNonUniformShuffleXor,                 6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformShuffleUp",                 saOp_GroupNonUniformShuffleUp,                  6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformShuffleDown",               saOp_GroupNonUniformShuffleDown,                6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformIAdd",                      saOp_GroupNonUniformIAdd,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformFAdd",                      saOp_GroupNonUniformFAdd,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformIMul",                      saOp_GroupNonUniformIMul,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformFMul",                      saOp_GroupNonUniformFMul,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformSMin",                      saOp_GroupNonUniformSMin,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformUMin",                      saOp_GroupNonUniformUMin,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformFMin",                      saOp_GroupNonUniformFMin,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformSMax",                      saOp_GroupNonUniformSMax,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformUMax",                      saOp_GroupNonUniformUMax,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformFMax",                      saOp_GroupNonUniformFMax,                       6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformBitwiseAnd",                saOp_GroupNonUniformBitwiseAnd,                 6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformBitwiseOr",                 saOp_GroupNonUniformBitwiseOr,                  6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformBitwiseXor",                saOp_GroupNonUniformBitwiseXor,                 6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformLogicalAnd",                saOp_GroupNonUniformLogicalAnd,                 6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformLogicalOr",                 saOp_GroupNonUniformLogicalOr,                  6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformLogicalXor",                saOp_GroupNonUniformLogicalXor,                 6, SA_TRUE,  { saAsmEnum_Scope, saAsmEnum_GroupOperation, SA_UINT32_MAX } },
+  { "GroupNonUniformQuadBroadcast",             saOp_GroupNonUniformQuadBroadcast,              6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "GroupNonUniformQuadSwap",                  saOp_GroupNonUniformQuadSwap,                   6, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
+  { "CopyLogical",                              saOp_CopyLogical,                               4, SA_FALSE, { SA_UINT32_MAX } },
+  { "PtrEqual",                                 saOp_PtrEqual,                                  5, SA_FALSE, { SA_UINT32_MAX } },
+  { "PtrNotEqual",                              saOp_PtrNotEqual,                               5, SA_FALSE, { SA_UINT32_MAX } },
+  { "PtrDiff",                                  saOp_PtrDiff,                                   5, SA_FALSE, { SA_UINT32_MAX } }
+};
+
+// Table with all keywords possible in SPA/SBA
+const struct sa__assemblerLowLevelEnumerantConnection_s SA_ASSEMBLER_LOW_LEVEL_ENUMS[saAsmEnum_COUNT][SA_MAX_ENUMERANT_ENTRIES] = {
+  {
+    { "Vertex", saEntryPoint_Vertex },
+    { "TessellationControl", saEntryPoint_TessellationControl },
+    { "TessellationEvaluation", saEntryPoint_TessellationEvaluation },
+    { "Geometry", saEntryPoint_Geometry },
+    { "Fragment", saEntryPoint_Fragment },
+    { "GLCompute", saEntryPoint_GLCompute },
+    { "Kernel", saEntryPoint_Kernel },
+    { "TaskNV", saEntryPoint_TaskNV },
+    { "MeshNV", saEntryPoint_MeshNV },
+    { "RayGenerationKHR", saEntryPoint_RayGenerationKHR },
+    { "IntersectionKHR", saEntryPoint_IntersectionKHR },
+    { "AnyHitKHR", saEntryPoint_AnyHitKHR },
+    { "ClosestHitKHR", saEntryPoint_ClosestHitKHR },
+    { "MissKHR", saEntryPoint_MissKHR },
+    { "CallableKHR", saEntryPoint_CallableKHR },
+    { "TaskEXT", saEntryPoint_TaskEXT },
+    { "MeshEXT", saEntryPoint_MeshEXT },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "UniformConstant", saStorageClass_UniformConstant },
+    { "Input", saStorageClass_Input },
+    { "Uniform", saStorageClass_Uniform },
+    { "Output", saStorageClass_Output },
+    { "Workgroup", saStorageClass_Workgroup },
+    { "CrossWorkgroup", saStorageClass_CrossWorkgroup },
+    { "Private", saStorageClass_Private },
+    { "Function", saStorageClass_Function },
+    { "Generic", saStorageClass_Generic },
+    { "PushConstant", saStorageClass_PushConstant },
+    { "AtomicCounter", saStorageClass_AtomicCounter },
+    { "Image", saStorageClass_Image },
+    { "StorageBuffer", saStorageClass_StorageBuffer },
+    { "TileImageEXT", saStorageClass_TileImageEXT },
+    { "NodePayloadAMDX", saStorageClass_NodePayloadAMDX },
+    { "CallableDataKHR", saStorageClass_CallableDataKHR },
+    { "IncomingCallableDataKHR", saStorageClass_IncomingCallableDataKHR },
+    { "RayPayloadKHR", saStorageClass_RayPayloadKHR },
+    { "HitAttributeKHR", saStorageClass_HitAttributeKHR },
+    { "IncomingRayPayloadKHR", saStorageClass_IncomingRayPayloadKHR },
+    { "ShaderRecordBufferKHR", saStorageClass_ShaderRecordBufferKHR },
+    { "PhysicalStorageBuffer", saStorageClass_PhysicalStorageBuffer },
+    { "HitObjectAttributeNV", saStorageClass_HitObjectAttributeNV },
+    { "TaskPayloadWorkgroupEXT", saStorageClass_TaskPayloadWorkgroupEXT },
+    { "CodeSelectionINTEL", saStorageClass_CodeSelectionINTEL },
+    { "DeviceOnlyINTEL", saStorageClass_DeviceOnlyINTEL },
+    { "HostOnlyINTEL", saStorageClass_HostOnlyINTEL },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "1D", saImageDimmension_1D },
+    { "2D", saImageDimmension_2D },
+    { "3D", saImageDimmension_3D },
+    { "Cube", saImageDimmension_Cube },
+    { "Rect", saImageDimmension_Rect },
+    { "Buffer", saImageDimmension_Buffer },
+    { "SubpassData", saImageDimmension_SubpassData },
+    { "TileImageDataEXT", saImageDimmension_TileImageDataEXT },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saSamplerAddressingMode_None },
+    { "ClampToEdge", saSamplerAddressingMode_ClampToEdge },
+    { "Clamp", saSamplerAddressingMode_Clamp },
+    { "Repeat", saSamplerAddressingMode_Repeat },
+    { "RepeatMirrored", saSamplerAddressingMode_RepeatMirrored },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "Nearest", saSamplerFilterMode_Nearest },
+    { "Linear", saSamplerFilterMode_Linear },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "Unknown", saImageFormat_Unknown },
+    { "Rgba32f", saImageFormat_Rgba32f },
+    { "Rgba16f", saImageFormat_Rgba16f },
+    { "R32f", saImageFormat_R32f },
+    { "Rgba8", saImageFormat_Rgba8 },
+    { "Rgba8Snorm", saImageFormat_Rgba8Snorm },
+    { "Rg32f", saImageFormat_Rg32f },
+    { "Rg16f", saImageFormat_Rg16f },
+    { "R11fG11fB10f", saImageFormat_R11fG11fB10f },
+    { "R16f", saImageFormat_R16f },
+    { "Rgba16", saImageFormat_Rgba16 },
+    { "Rgb10A2", saImageFormat_Rgb10A2 },
+    { "Rg16", saImageFormat_Rg16 },
+    { "Rg8", saImageFormat_Rg8 },
+    { "R16", saImageFormat_R16 },
+    { "R8", saImageFormat_R8 },
+    { "Rgba16Snorm", saImageFormat_Rgba16Snorm },
+    { "Rg16Snorm", saImageFormat_Rg16Snorm },
+    { "Rg8Snorm", saImageFormat_Rg8Snorm },
+    { "R16Snorm", saImageFormat_R16Snorm },
+    { "R8Snorm", saImageFormat_R8Snorm },
+    { "Rgba32i", saImageFormat_Rgba32i },
+    { "Rgba16i", saImageFormat_Rgba16i },
+    { "Rgba8i", saImageFormat_Rgba8i },
+    { "R32i", saImageFormat_R32i },
+    { "Rg32i", saImageFormat_Rg32i },
+    { "Rg16i", saImageFormat_Rg16i },
+    { "Rg8i", saImageFormat_Rg8i },
+    { "R16i", saImageFormat_R16i },
+    { "R8i", saImageFormat_R8i },
+    { "Rgba32ui", saImageFormat_Rgba32ui },
+    { "Rgba16ui", saImageFormat_Rgba16ui },
+    { "Rgba8ui", saImageFormat_Rgba8ui },
+    { "R32ui", saImageFormat_R32ui },
+    { "Rgb10a2ui", saImageFormat_Rgb10a2ui },
+    { "Rg32ui", saImageFormat_Rg32ui },
+    { "Rg16ui", saImageFormat_Rg16ui },
+    { "Rg8ui", saImageFormat_Rg8ui },
+    { "R16ui", saImageFormat_R16ui },
+    { "R8ui", saImageFormat_R8ui },
+    { "R64ui", saImageFormat_R64ui },
+    { "R64i", saImageFormat_R64i },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "R", saImageChannelOrder_R },
+    { "A", saImageChannelOrder_A },
+    { "RG", saImageChannelOrder_RG },
+    { "RA", saImageChannelOrder_RA },
+    { "RGB", saImageChannelOrder_RGB },
+    { "RGBA", saImageChannelOrder_RGBA },
+    { "BGRA", saImageChannelOrder_BGRA },
+    { "ARGB", saImageChannelOrder_ARGB },
+    { "Intensity", saImageChannelOrder_Intensity },
+    { "Luminance", saImageChannelOrder_Luminance },
+    { "Rx", saImageChannelOrder_Rx },
+    { "RGx", saImageChannelOrder_RGx },
+    { "RGBx", saImageChannelOrder_RGBx },
+    { "Depth", saImageChannelOrder_Depth },
+    { "DepthStencil", saImageChannelOrder_DepthStencil },
+    { "sRGB", saImageChannelOrder_sRGB },
+    { "sRGBx", saImageChannelOrder_sRGBx },
+    { "sRGBA", saImageChannelOrder_sRGBA },
+    { "sBGRA", saImageChannelOrder_sBGRA },
+    { "ABGR", saImageChannelOrder_ABGR },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "SnormInt8", saImageChannelDataFormat_SnormInt8 },
+    { "SnormInt16", saImageChannelDataFormat_SnormInt16 },
+    { "UnormInt8", saImageChannelDataFormat_UnormInt8 },
+    { "UnormInt16", saImageChannelDataFormat_UnormInt16 },
+    { "UnormShort565", saImageChannelDataFormat_UnormShort565 },
+    { "UnormShort555", saImageChannelDataFormat_UnormShort555 },
+    { "UnormInt101010", saImageChannelDataFormat_UnormInt101010 },
+    { "SignedInt8", saImageChannelDataFormat_SignedInt8 },
+    { "SignedInt16", saImageChannelDataFormat_SignedInt16 },
+    { "SignedInt32", saImageChannelDataFormat_SignedInt32 },
+    { "UnsignedInt8", saImageChannelDataFormat_UnsignedInt8 },
+    { "UnsignedInt16", saImageChannelDataFormat_UnsignedInt16 },
+    { "UnsignedInt32", saImageChannelDataFormat_UnsignedInt32 },
+    { "HalfFloat", saImageChannelDataFormat_HalfFloat },
+    { "Float", saImageChannelDataFormat_Float },
+    { "UnormInt24", saImageChannelDataFormat_UnormInt24 },
+    { "UnormInt101010_2", saImageChannelDataFormat_UnormInt101010_2 },
+    { "UnsignedIntRaw10EXT", saImageChannelDataFormat_UnsignedIntRaw10EXT },
+    { "UnsignedIntRaw12EXT", saImageChannelDataFormat_UnsignedIntRaw12EXT },
+    { "UnormInt2_101010EXT", saImageChannelDataFormat_UnormInt2_101010EXT },
+    { "UnsignedInt10X6EXT", saImageChannelDataFormat_UnsignedInt10X6EXT },
+    { "UnsignedInt12X4EXT", saImageChannelDataFormat_UnsignedInt12X4EXT },
+    { "UnsignedInt14X2EXT", saImageChannelDataFormat_UnsignedInt14X2EXT },
+    { "UnormInt12X4EXT", saImageChannelDataFormat_UnormInt12X4EXT },
+    { "UnormInt14X2EXT", saImageChannelDataFormat_UnormInt14X2EXT },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saImageOperands_None },
+    { "Bias", saImageOperands_Bias },
+    { "Lod", saImageOperands_Lod },
+    { "Grad", saImageOperands_Grad },
+    { "ConstOffset", saImageOperands_ConstOffset },
+    { "Offset", saImageOperands_Offset },
+    { "ConstOffsets", saImageOperands_ConstOffsets },
+    { "Sample", saImageOperands_Sample },
+    { "MinLod", saImageOperands_MinLod },
+    { "MakeTexelAvailable", saImageOperands_MakeTexelAvailable },
+    { "MakeTexelVisible", saImageOperands_MakeTexelVisible },
+    { "NonPrivateTexel", saImageOperands_NonPrivateTexel },
+    { "VolatileTexel", saImageOperands_VolatileTexel },
+    { "SignExtent", saImageOperands_SignExtent },
+    { "ZeroExtent", saImageOperands_ZeroExtent },
+    { "Nontemporal", saImageOperands_Nontemporal },
+    { "Offsets", saImageOperands_Offsets },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saFPFastMathMode_None },
+    { "NotNan", saFPFastMathMode_NotNan },
+    { "NotInf", saFPFastMathMode_NotInf },
+    { "NSZ", saFPFastMathMode_NSZ },
+    { "AllowReciprocal", saFPFastMathMode_AllowReciprocal },
+    { "Fast", saFPFastMathMode_Fast },
+    { "AllowContract", saFPFastMathMode_AllowContract },
+    { "AllowReassoc", saFPFastMathMode_AllowReassoc },
+    { "AllowTransform", saFPFastMathMode_AllowTransform },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "ToNearestEven", saFPRoundingMode_ToNearestEven },
+    { "ToZero", saFPRoundingMode_ToZero },
+    { "ToPositiveInfinity", saFPRoundingMode_ToPositiveInfinity },
+    { "ToNegativeInfinity", saFPRoundingMode_ToNegativeInfinity },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "Export", saLinkageType_Export },
+    { "Import", saLinkageType_Import },
+    { "LinkOnceODR", saLinkageType_LinkOnceODR },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "ReadOnly", saAccessQualifiers_ReadOnly },
+    { "WriteOnly", saAccessQualifiers_WriteOnly },
+    { "ReadWrite", saAccessQualifiers_ReadWrite },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "ZeroExtend", saFunctionParameterAttrib_ZeroExtend },
+    { "SignExtend", saFunctionParameterAttrib_SignExtend },
+    { "ByValue", saFunctionParameterAttrib_ByValue },
+    { "StructReturn", saFunctionParameterAttrib_StructReturn },
+    { "NoAlias", saFunctionParameterAttrib_NoAlias },
+    { "NoCaptute", saFunctionParameterAttrib_NoCaptute },
+    { "NoWrite", saFunctionParameterAttrib_NoWrite },
+    { "NoReadWrite", saFunctionParameterAttrib_NoReadWrite },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "RelaxedPrecision", saDecoration_RelaxedPrecision },
+    { "SpecId", saDecoration_SpecId },
+    { "Block", saDecoration_Block },
+    { "BufferBlock", saDecoration_BufferBlock },
+    { "RowMajor", saDecoration_RowMajor },
+    { "ColMajor", saDecoration_ColMajor },
+    { "ArrayStride", saDecoration_ArrayStride },
+    { "MatrixStride", saDecoration_MatrixStride },
+    { "GLSLShared", saDecoration_GLSLShared },
+    { "GLSLPacked", saDecoration_GLSLPacked },
+    { "CPacked", saDecoration_CPacked },
+    { "BuiltIn", saDecoration_BuiltIn },
+    { "NoPerspective", saDecoration_NoPerspective },
+    { "Flat", saDecoration_Flat },
+    { "Patch", saDecoration_Patch },
+    { "Centroid", saDecoration_Centroid },
+    { "Sample", saDecoration_Sample },
+    { "Invariant", saDecoration_Invariant },
+    { "Restrict", saDecoration_Restrict },
+    { "Aliased", saDecoration_Aliased },
+    { "Volatile", saDecoration_Volatile },
+    { "Constant", saDecoration_Constant },
+    { "Coherent", saDecoration_Coherent },
+    { "NonWritable", saDecoration_NonWritable },
+    { "NonReadable", saDecoration_NonReadable },
+    { "Uniform", saDecoration_Uniform },
+    { "UniformId", saDecoration_UniformId },
+    { "SaturatedConversion", saDecoration_SaturatedConversion },
+    { "Stream", saDecoration_Stream },
+    { "Location", saDecoration_Location },
+    { "Component", saDecoration_Component },
+    { "Index", saDecoration_Index },
+    { "Binding", saDecoration_Binding },
+    { "DescriptorSet", saDecoration_DescriptorSet },
+    { "Offset", saDecoration_Offset },
+    { "XfbBuffer", saDecoration_XfbBuffer },
+    { "XfbStride", saDecoration_XfbStride },
+    { "FuncParamAttrib", saDecoration_FuncParamAttrib },
+    { "FPRoundingMode", saDecoration_FPRoundingMode },
+    { "FPFastMathMode", saDecoration_FPFastMathMode },
+    { "LinkageAttribs", saDecoration_LinkageAttribs },
+    { "NoContraction", saDecoration_NoContraction },
+    { "InputAttachmentIndex", saDecoration_InputAttachmentIndex },
+    { "Alignment", saDecoration_Alignment },
+    { "MaxByteOffset", saDecoration_MaxByteOffset },
+    { "AlignmentId", saDecoration_AlignmentId },
+    { "MaxByteOffsetId", saDecoration_MaxByteOffsetId },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "Position", saDecorationBuiltIn_Position },
+    { "PointSize", saDecorationBuiltIn_PointSize },
+    { "ClipDistance", saDecorationBuiltIn_ClipDistance },
+    { "CullDistance", saDecorationBuiltIn_CullDistance },
+    { "VertexId", saDecorationBuiltIn_VertexId },
+    { "InstanceId", saDecorationBuiltIn_InstanceId },
+    { "PrimitiveId", saDecorationBuiltIn_PrimitiveId },
+    { "InvocationId", saDecorationBuiltIn_InvocationId },
+    { "Layer", saDecorationBuiltIn_Layer },
+    { "ViewportIndex", saDecorationBuiltIn_ViewportIndex },
+    { "TessLevelOuter", saDecorationBuiltIn_TessLevelOuter },
+    { "TessLevelInner", saDecorationBuiltIn_TessLevelInner },
+    { "TessCoord", saDecorationBuiltIn_TessCoord },
+    { "PatchVertices", saDecorationBuiltIn_PatchVertices },
+    { "FragCoord", saDecorationBuiltIn_FragCoord },
+    { "PointCoord", saDecorationBuiltIn_PointCoord },
+    { "FrontFacing", saDecorationBuiltIn_FrontFacing },
+    { "SampleId", saDecorationBuiltIn_SampleId },
+    { "SamplePosition", saDecorationBuiltIn_SamplePosition },
+    { "SampleMask", saDecorationBuiltIn_SampleMask },
+    { "FragDepth", saDecorationBuiltIn_FragDepth },
+    { "HelperInvocation", saDecorationBuiltIn_HelperInvocation },
+    { "NumWorkgroups", saDecorationBuiltIn_NumWorkgroups },
+    { "WorkgroupSize", saDecorationBuiltIn_WorkgroupSize },
+    { "WorkgroupId", saDecorationBuiltIn_WorkgroupId },
+    { "LocalInvocationId", saDecorationBuiltIn_LocalInvocationId },
+    { "GlobalInvocationId", saDecorationBuiltIn_GlobalInvocationId },
+    { "LocalInvocationIndex", saDecorationBuiltIn_LocalInvocationIndex },
+    { "WorkDim", saDecorationBuiltIn_WorkDim },
+    { "GlobalSize", saDecorationBuiltIn_GlobalSize },
+    { "EnqueuedWorkgroupSize", saDecorationBuiltIn_EnqueuedWorkgroupSize },
+    { "GlobalOffset", saDecorationBuiltIn_GlobalOffset },
+    { "GlobalLinearId", saDecorationBuiltIn_GlobalLinearId },
+    { "SubgroupSize", saDecorationBuiltIn_SubgroupSize },
+    { "SubgroupMaxSize", saDecorationBuiltIn_SubgroupMaxSize },
+    { "NumSubgroups", saDecorationBuiltIn_NumSubgroups },
+    { "NumEnqueuedSubgroups", saDecorationBuiltIn_NumEnqueuedSubgroups },
+    { "SubgroupId", saDecorationBuiltIn_SubgroupId },
+    { "SubgroupLocalInvocationId", saDecorationBuiltIn_SubgroupLocalInvocationId },
+    { "VertexIndex", saDecorationBuiltIn_VertexIndex },
+    { "InstanceIndex", saDecorationBuiltIn_InstanceIndex },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saSelectionControl_None },
+    { "Flatten", saSelectionControl_Flatten },
+    { "DontFlatten", saSelectionControl_DontFlatten },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saLoopControl_None },
+    { "Unroll", saLoopControl_Unroll },
+    { "DontUnroll", saLoopControl_DontUnroll },
+    { "DependencyInfinite", saLoopControl_DependencyInfinite },
+    { "DependencyLength", saLoopControl_DependencyLength },
+    { "MinIterations", saLoopControl_MinIterations },
+    { "MaxIterations", saLoopControl_MaxIterations },
+    { "IterationMultiple", saLoopControl_IterationMultiple },
+    { "PeelCount", saLoopControl_PeelCount },
+    { "PartialCount", saLoopControl_PartialCount },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saFunctionControl_None },
+    { "Inline", saFunctionControl_Inline },
+    { "DontInline", saFunctionControl_DontInline },
+    { "Pure", saFunctionControl_Pure },
+    { "Const", saFunctionControl_Const },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saMemorySemantics_None },
+    { "Acquire", saMemorySemantics_Acquire },
+    { "Release", saMemorySemantics_Release },
+    { "AcquireRelease", saMemorySemantics_AcquireRelease },
+    { "SequentiallyConsistent", saMemorySemantics_SequentiallyConsistent },
+    { "UniformMemory", saMemorySemantics_UniformMemory },
+    { "SubgroupMemory", saMemorySemantics_SubgroupMemory },
+    { "WorkgroupMemory", saMemorySemantics_WorkgroupMemory },
+    { "CrossWorkgroupMemory", saMemorySemantics_CrossWorkgroupMemory },
+    { "AtomicCounterMemory", saMemorySemantics_AtomicCounterMemory },
+    { "ImageMemory", saMemorySemantics_ImageMemory },
+    { "OutputMemory", saMemorySemantics_OutputMemory },
+    { "MakeAvailable", saMemorySemantics_MakeAvailable },
+    { "MakeVisible", saMemorySemantics_MakeVisible },
+    { "Volatile", saMemorySemantics_Volatile },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "None", saMemoryOperands_None },
+    { "Volatile", saMemoryOperands_Volatile },
+    { "Aligned", saMemoryOperands_Aligned },
+    { "Nontemporal", saMemoryOperands_Nontemporal },
+    { "MakePointerAvailable", saMemoryOperands_MakePointerAvailable },
+    { "MakePointerVisible", saMemoryOperands_MakePointerVisible },
+    { "NonPrivatePointer", saMemoryOperands_NonPrivatePointer },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "CrossDevice", saScope_CrossDevice },
+    { "Device", saScope_Device },
+    { "Workgroup", saScope_Workgroup },
+    { "Subgroup", saScope_Subgroup },
+    { "Invocation", saScope_Invocation },
+    { "QueueFamily", saScope_QueueFamily },
+    { "ShaderCallKHR", saScope_ShaderCallKHR },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "Reduce", saGroupOperation_Reduce },
+    { "InclusiveScan", saGroupOperation_InclusiveScan },
+    { "ExclusiveScan", saGroupOperation_ExclusiveScan },
+    { "ClusterReduce", saGroupOperation_ClusterReduce },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "Invocations", saExecutionMode_Invocations },
+    { "SpacingEqual", saExecutionMode_SpacingEqual },
+    { "SpacingFractionalEven", saExecutionMode_SpacingFractionalEven },
+    { "SpacingFractionalOdd", saExecutionMode_SpacingFractionalOdd },
+    { "VertexOrderCw", saExecutionMode_VertexOrderCw },
+    { "VertexOrderCcw", saExecutionMode_VertexOrderCcw },
+    { "PixelCenterInteger", saExecutionMode_PixelCenterInteger },
+    { "OriginUpperLeft", saExecutionMode_OriginUpperLeft },
+    { "OriginLowerLeft", saExecutionMode_OriginLowerLeft },
+    { "EarlyFragmentTests", saExecutionMode_EarlyFragmentTests },
+    { "PointMode", saExecutionMode_PointMode },
+    { "Xfb", saExecutionMode_Xfb },
+    { "DepthReplacing", saExecutionMode_DepthReplacing },
+    { "DepthGreater", saExecutionMode_DepthGreater },
+    { "DepthLess", saExecutionMode_DepthLess },
+    { "DepthUnchanged", saExecutionMode_DepthUnchanged },
+    { "LocalSize", saExecutionMode_LocalSize },
+    { "LocalSizeHint", saExecutionMode_LocalSizeHint },
+    { "InputPoints", saExecutionMode_InputPoints },
+    { "InputLines", saExecutionMode_InputLines },
+    { "InputLinesAdjacency", saExecutionMode_InputLinesAdjacency },
+    { "InputTriangles", saExecutionMode_InputTriangles },
+    { "InputTrianglesAdjacency", saExecutionMode_InputTrianglesAdjacency },
+    { "Quads", saExecutionMode_Quads },
+    { "Isolines", saExecutionMode_Isolines },
+    { "OutputVertices", saExecutionMode_OutputVertices },
+    { "OutputPoints", saExecutionMode_OutputPoints },
+    { "OutputLineStrip", saExecutionMode_OutputLineStrip },
+    { "OutputTriangleStrip", saExecutionMode_OutputTriangleStrip },
+    { "VecTypeHint", saExecutionMode_VecTypeHint },
+    { "ContractionOff", saExecutionMode_ContractionOff },
+    { "Initializer", saExecutionMode_Initializer },
+    { "Finalizer", saExecutionMode_Finalizer },
+    { "SubgroupSize", saExecutionMode_SubgroupSize },
+    { "SubgroupsPerWorkgroup", saExecutionMode_SubgroupsPerWorkgroup },
+    { "SubgroupsPerWorkgroupId", saExecutionMode_SubgroupsPerWorkgroupId },
+    { "LocalSizeId", saExecutionMode_LocalSizeId },
+    { "LocalSizeHintId", saExecutionMode_LocalSizeHintId },
+    { "NonCoherentColorAttachmentReadEXT", saExecutionMode_NonCoherentColorAttachmentReadEXT },
+    { "NonCoherentDepthAttachmentReadEXT", saExecutionMode_NonCoherentDepthAttachmentReadEXT },
+    { "NonCoherentStencilAttachmentReadEXT", saExecutionMode_NonCoherentStencilAttachmentReadEXT },
+    { "SubgroupUniformControlFlowKHR", saExecutionMode_SubgroupUniformControlFlowKHR },
+    { "PostDepthCoverage", saExecutionMode_PostDepthCoverage },
+    { "DenormPreserve", saExecutionMode_DenormPreserve },
+    { "DenormFlushToZero", saExecutionMode_DenormFlushToZero },
+    { "SignedZeroInfNanPreserve", saExecutionMode_SignedZeroInfNanPreserve },
+    { "RoundingModeRTE", saExecutionMode_RoundingModeRTE },
+    { "RoundingModeRTZ", saExecutionMode_RoundingModeRTZ },
+    { "EarlyAndLateFragmentTestsAMD", saExecutionMode_EarlyAndLateFragmentTestsAMD },
+    { "StencilRefReplacingEXT", saExecutionMode_StencilRefReplacingEXT },
+    { "CoalesaingAMDX", saExecutionMode_CoalesaingAMDX },
+    { "IsApiEntryAMDX", saExecutionMode_IsApiEntryAMDX },
+    { "MaxNodeRecursionAMDX", saExecutionMode_MaxNodeRecursionAMDX },
+    { "StaticNumWorkgroupsAMDX", saExecutionMode_StaticNumWorkgroupsAMDX },
+    { "ShaderIndexAMDX", saExecutionMode_ShaderIndexAMDX },
+    { "MaxNumWorkgroupsAMDX", saExecutionMode_MaxNumWorkgroupsAMDX },
+    { "StencilRefUnchangedFrontAMD", saExecutionMode_StencilRefUnchangedFrontAMD },
+    { "StencilRefGreaterFrontAMD", saExecutionMode_StencilRefGreaterFrontAMD },
+    { "StencilRefLessFrontAMD", saExecutionMode_StencilRefLessFrontAMD },
+    { "StencilRefUnchangedBackAMD", saExecutionMode_StencilRefUnchangedBackAMD },
+    { "StencilRefGreaterBackAMD", saExecutionMode_StencilRefGreaterBackAMD },
+    { "StencilRefLessBackAMD", saExecutionMode_StencilRefLessBackAMD },
+    { "QuadDerivativesKHR", saExecutionMode_QuadDerivativesKHR },
+    { "RequireFullQuadsKHR", saExecutionMode_RequireFullQuadsKHR },
+    { "ShareInputWithAMDX", saExecutionMode_ShareInputWithAMDX },
+    { "OutputLinesEXT", saExecutionMode_OutputLinesEXT },
+    { "OutputPrimitivesEXT", saExecutionMode_OutputPrimitivesEXT },
+    { "DerivativeGroupQuadsKHR", saExecutionMode_DerivativeGroupQuadsKHR },
+    { "DerivativeGroupLinearKHR", saExecutionMode_DerivativeGroupLinearKHR },
+    { "OutputTrianglesEXT", saExecutionMode_OutputTrianglesEXT },
+    { "PixelInterlockOrderedEXT", saExecutionMode_PixelInterlockOrderedEXT },
+    { "PixelInterlockUnorderedEXT", saExecutionMode_PixelInterlockUnorderedEXT },
+    { "SamplerInterlockOrderedEXT", saExecutionMode_SamplerInterlockOrderedEXT },
+    { "SamplerInterlockUnorderedEXT", saExecutionMode_SamplerInterlockUnorderedEXT },
+    { "ShadingRateInterlockOrderedEXT", saExecutionMode_ShadingRateInterlockOrderedEXT },
+    { "ShadingRateInterlockUnorderedEXT", saExecutionMode_ShadingRateInterlockUnorderedEXT },
+    { "SharedLocalMemorySizeINTEL", saExecutionMode_SharedLocalMemorySizeINTEL },
+    { "RoundingModeRTPINTEL", saExecutionMode_RoundingModeRTPINTEL },
+    { "RoundingModeRTNINTEL", saExecutionMode_RoundingModeRTNINTEL },
+    { "FloatingPointModeALTINTEL", saExecutionMode_FloatingPointModeALTINTEL },
+    { "FloatingPointModeIEEEINTEL", saExecutionMode_FloatingPointModeIEEEINTEL },
+    { "MaxWorkgroupSizeINTEL", saExecutionMode_MaxWorkgroupSizeINTEL },
+    { "MaxWorkDimIMTEL", saExecutionMode_MaxWorkDimIMTEL },
+    { "NoGlobalOffsetINTEL", saExecutionMode_NoGlobalOffsetINTEL },
+    { "NumSIMDWorkitemsINTEL", saExecutionMode_NumSIMDWorkitemsINTEL },
+    { "schedulerTargetFmaxMhzINTEL", saExecutionMode_schedulerTargetFmaxMhzINTEL },
+    { "MaximallyReconvergesKHR", saExecutionMode_MaximallyReconvergesKHR },
+    { "FPFastMathDefault", saExecutionMode_FPFastMathDefault },
+    { "StreamingInterfaceINTEL", saExecutionMode_StreamingInterfaceINTEL },
+    { "RegisterMapInterfaceINTEL", saExecutionMode_RegisterMapInterfaceINTEL },
+    { "NamedBarrierCountINTEL", saExecutionMode_NamedBarrierCountINTEL },
+    { "MaximumRegistersINTEL", saExecutionMode_MaximumRegistersINTEL },
+    { "MaximumRegistersIdINTEL", saExecutionMode_MaximumRegistersIdINTEL },
+    { "NamedMaximumRegistersINTEL", saExecutionMode_NamedMaximumRegistersINTEL },
+    { SA_NULL, SA_UINT32_MAX }
+  }
 };
 
 // This is the big blob of every basic opcode, could be done better with some lookup table
 static const char* sa__opcodeToString(sa_uint16_t opcode) {
   switch(opcode) {
-    case saOp_Nop: return "OpNop"; break;
-    case saOp_Undef: return "OpUndef"; break;
-    case saOp_SourceContinued: return "OpSourceContinued"; break;
-    case saOp_Source: return "OpSource"; break;
-    case saOp_SourceExtension: return "OpSourceExtension"; break;
-    case saOp_Name: return "OpName"; break;
-    case saOp_MemberName: return "OpMemberName"; break;
-    case saOp_String: return "OpString"; break;
-    case saOp_Line: return "OpLine"; break;
-    case saOp_Extension: return "OpExtension"; break;
-    case saOp_ExtInstImport: return "OpExtInstImport"; break;
-    case saOp_ExtInst: return "OpExtInst"; break;
-    case saOp_MemoryModel: return "OpMemoryModel"; break;
-    case saOp_EntryPoint: return "OpEntryPoint"; break;
-    case saOp_ExecutionMode: return "OpExecutionMode"; break;
-    case saOp_Capability: return "OpCapability"; break;
-    case saOp_TypeVoid: return "OpTypeVoid"; break;
-    case saOp_TypeBool: return "OpTypeBool"; break;
-    case saOp_TypeInt: return "OpTypeInt"; break;
-    case saOp_TypeFloat: return "OpTypeFloat"; break;
-    case saOp_TypeVector: return "OpTypeVector"; break;
-    case saOp_TypeMatrix: return "OpTypeMatrix"; break;
-    case saOp_TypeImage: return "OpTypeImage"; break;
-    case saOp_TypeSampler: return "OpTypeSampler"; break;
-    case saOp_TypeSampledImage: return "OpTypeSampledImage"; break;
-    case saOp_TypeArray: return "OpTypeArray"; break;
-    case saOp_TypeRuntimeArray: return "OpTypeRuntimeArray"; break;
-    case saOp_TypeStruct: return "OpTypeStruct"; break;
-    case saOp_TypeOpaque: return "OpTypeOpaque"; break;
-    case saOp_TypePointer: return "OpTypePointer"; break;
-    case saOp_TypeFunction: return "OpTypeFunction"; break;
-    case saOp_TypeEvent: return "OpTypeEvent"; break;
-    case saOp_TypeDeviceEvent: return "OpTypeDeviceEvent"; break;
-    case saOp_TypeReserveId: return "OpTypeReserveId"; break;
-    case saOp_TypeQueue: return "OpTypeQueue"; break;
-    case saOp_TypePipe: return "OpTypePipe"; break;
-    case saOp_TypeForwardPointer: return "OpTypeForwardPointer"; break;
-    case saOp_ConstantTrue: return "OpConstantTrue"; break;
-    case saOp_ConstantFalse: return "OpConstantFalse"; break;
-    case saOp_Constant: return "OpConstant"; break;
-    case saOp_ConstantComposite: return "OpConstantComposite"; break;
-    case saOp_ConstantSampler: return "OpConstantSampler"; break;
-    case saOp_ConstantNull: return "OpConstantNull"; break;
-    case saOp_SpecConstantTrue: return "OpSpecConstantTrue"; break;
-    case saOp_SpecConstantFalse: return "OpSpecConstantFalse"; break;
-    case saOp_SpecConstant: return "OpSpecConstant"; break;
-    case saOp_SpecConstantComposite: return "OpSpecConstantComposite"; break;
-    case saOp_SpecConstantOp: return "OpSpecConstantOp"; break;
-    case saOp_Function: return "OpFunction"; break;
-    case saOp_FunctionParameter: return "OpFunctionParameter"; break;
-    case saOp_FunctionEnd: return "OpFunctionEnd"; break;
-    case saOp_FunctionCall: return "OpFunctionCall"; break;
-    case saOp_Variable: return "OpVariable"; break;
-    case saOp_ImageTexelPointer: return "OpImageTexelPointer"; break;
-    case saOp_Load: return "OpLoad"; break;
-    case saOp_Store: return "OpStore"; break;
-    case saOp_CopyMemory: return "OpCopyMemory"; break;
-    case saOp_CopyMemorySized: return "OpCopyMemorySized"; break;
-    case saOp_AccessChain: return "OpAccessChain"; break;
-    case saOp_InBoundsAccessChain: return "OpInBoundsAccessChain"; break;
-    case saOp_PtrAccessChain: return "OpPtrAccessChain"; break;
-    case saOp_ArrayLength: return "OpArrayLength"; break;
-    case saOp_GenericPtrMemSemantics: return "OpGenericPtrMemSemantics"; break;
-    case saOp_InBoundsPtrAccessChain: return "OpInBoundsPtrAccessChain"; break;
-    case saOp_Decorate: return "OpDecorate"; break;
-    case saOp_MemberDecorate: return "OpMemberDecorate"; break;
-    case saOp_DecorationGroup: return "OpDecorationGroup"; break;
-    case saOp_GroupDecorate: return "OpGroupDecorate"; break;
-    case saOp_GroupMemberDecorate: return "OpGroupMemberDecorate"; break;
-    case saOp_VectorExtractDynamic: return "OpVectorExtractDynamic"; break;
-    case saOp_VectorInsertDynamic: return "OpVectorInsertDynamic"; break;
-    case saOp_VectorShuffle: return "OpVectorShuffle"; break;
-    case saOp_CompositeConstruct: return "OpCompositeConstruct"; break;
-    case saOp_CompositeExtract: return "OpCompositeExtract"; break;
-    case saOp_CompositeInsert: return "OpCompositeInsert"; break;
-    case saOp_CopyObject: return "OpCopyObject"; break;
-    case saOp_Transpose: return "OpTranspose"; break;
-    case saOp_SampledImage: return "OpSampledImage"; break;
-    case saOp_ImageSampleImplicitLod: return "OpImageSampleImplicitLod"; break;
-    case saOp_ImageSampleExplicitLod: return "OpImageSampleExplicitLod"; break;
-    case saOp_ImageSampleDrefImplicitLod: return "OpImageSampleDrefImplicitLod"; break;
-    case saOp_ImageSampleDrefExplicitLod: return "OpImageSampleDrefExplicitLod"; break;
-    case saOp_ImageSampleProjImplicitLod: return "OpImageSampleProjImplicitLod"; break;
-    case saOp_ImageSampleProjExplicitLod: return "OpImageSampleProjExplicitLod"; break;
-    case saOp_ImageSampleProjDrefImplicitLod: return "OpImageSampleProjDrefImplicitLod"; break;
-    case saOp_ImageSampleProjDrefExplicitLod: return "OpImageSampleProjDrefExplicitLod"; break;
-    case saOp_ImageFetch: return "OpImageFetch"; break;
-    case saOp_ImageGather: return "OpImageGather"; break;
-    case saOp_ImageDrefGather: return "OpImageDrefGather"; break;
-    case saOp_ImageRead: return "OpImageRead"; break;
-    case saOp_ImageWrite: return "OpImageWrite"; break;
-    case saOp_Image: return "OpImage"; break;
-    case saOp_ImageQueryFormat: return "OpImageQueryFormat"; break;
-    case saOp_ImageQueryOrder: return "OpImageQueryOrder"; break;
-    case saOp_ImageQuerySizeLod: return "OpImageQuerySizeLod"; break;
-    case saOp_ImageQuerySize: return "OpImageQuerySize"; break;
-    case saOp_ImageQueryLod: return "OpImageQueryLod"; break;
-    case saOp_ImageQueryLevels: return "OpImageQueryLevels"; break;
-    case saOp_ImageQuerySamples: return "OpImageQuerySamples"; break;
-    case saOp_ConvertFToU: return "OpConvertFToU"; break;
-    case saOp_ConvertFToS: return "OpConvertFToS"; break;
-    case saOp_ConvertSToF: return "OpConvertSToF"; break;
-    case saOp_ConvertUToF: return "OpConvertUToF"; break;
-    case saOp_UConvert: return "OpUConvert"; break;
-    case saOp_SConvert: return "OpSConvert"; break;
-    case saOp_FConvert: return "OpFConvert"; break;
-    case saOp_QuantizeToF16: return "OpQuantizeToF16"; break;
-    case saOp_ConvertPtrToU: return "OpConvertPtrToU"; break;
-    case saOp_SatConvertSToU: return "OpSatConvertSToU"; break;
-    case saOp_SatConvertUToS: return "OpSatConvertUToS"; break;
-    case saOp_ConvertUToPtr: return "OpConvertUToPtr"; break;
-    case saOp_PtrCastToGeneric: return "OpPtrCastToGeneric"; break;
-    case saOp_GenericCastToPtr: return "OpGenericCastToPtr"; break;
-    case saOp_GenericCastToPtrExplicit: return "OpGenericCastToPtrExplicit"; break;
-    case saOp_Bitcast: return "OpBitcast"; break;
-    case saOp_SNegate: return "OpSNegate"; break;
-    case saOp_FNegate: return "OpFNegate"; break;
-    case saOp_IAdd: return "OpIAdd"; break;
-    case saOp_FAdd: return "OpFAdd"; break;
-    case saOp_ISub: return "OpISub"; break;
-    case saOp_FSub: return "OpFSub"; break;
-    case saOp_IMul: return "OpIMul"; break;
-    case saOp_FMul: return "OpFMul"; break;
-    case saOp_UDiv: return "OpUDiv"; break;
-    case saOp_SDiv: return "OpSDiv"; break;
-    case saOp_FDiv: return "OpFDiv"; break;
-    case saOp_UMul: return "OpUMul"; break;
-    case saOp_SRem: return "OpSRem"; break;
-    case saOp_SMod: return "OpSMod"; break;
-    case saOp_FRem: return "OpFRem"; break;
-    case saOp_FMod: return "OpFMod"; break;
-    case saOp_VectorTimesScalar: return "OpVectorTimesScalar"; break;
-    case saOp_MatrixTimesScalar: return "OpMatrixTimesScalar"; break;
-    case saOp_VectorTimesMatrix: return "OpVectorTimesMatrix"; break;
-    case saOp_MatrixTimesVector: return "OpMatrixTimesVector"; break;
-    case saOp_MatrixTimesMatrix: return "OpMatrixTimesMatrix"; break;
-    case saOp_OuterProduct: return "OpOuterProduct"; break;
-    case saOp_Dot: return "OpDot"; break;
-    case saOp_IAddCarry: return "OpIAddCarry"; break;
-    case saOp_ISubBorrow: return "OpISubBorrow"; break;
-    case saOp_UMulExtended: return "OpUMulExtended"; break;
-    case saOp_SMulExtended: return "OpSMulExtended"; break;
-    case saOp_Any: return "OpAny"; break;
-    case saOp_All: return "OpAll"; break;
-    case saOp_IsNan: return "OpIsNan"; break;
-    case saOp_IsInf: return "OpIsInf"; break;
-    case saOp_IsFinite: return "OpIsFinite"; break;
-    case saOp_IsNormal: return "OpIsNormal"; break;
-    case saOp_SignBitSet: return "OpSignBitSet"; break;
-    case saOp_LessOrGreater: return "OpLessOrGreater"; break;
-    case saOp_Ordered: return "OpOrdered"; break;
-    case saOp_Unordered: return "OpUnordered"; break;
-    case saOp_LogicalEqual: return "OpLogicalEqual"; break;
-    case saOp_LogicalNotEqual: return "OpLogicalNotEqual"; break;
-    case saOp_LogicalOr: return "OpLogicalOr"; break;
-    case saOp_LogicalAnd: return "OpLogicalAnd"; break;
-    case saOp_LogicalNot: return "OpLogicalNot"; break;
-    case saOp_Select: return "OpSelect"; break;
-    case saOp_IEqual: return "OpIEqual"; break;
-    case saOp_INotEqual: return "OpINotEqual"; break;
-    case saOp_UGreaterThan: return "OpUGreaterThan"; break;
-    case saOp_SGreaterThan: return "OpSGreaterThan"; break;
-    case saOp_UGreaterThanEqual: return "OpUGreaterThanEqual"; break;
-    case saOp_SGreaterThanEqual: return "OpSGreaterThanEqual"; break;
-    case saOp_ULessThan: return "OpULessThan"; break;
-    case saOp_SLessThan: return "OpSLessThan"; break;
-    case saOp_ULessThanEqual: return "OpULessThanEqual"; break;
-    case saOp_SLessThanEqual: return "OpSLessThanEqual"; break;
-    case saOp_FOrdEqual: return "OpFOrdEqual"; break;
-    case saOp_FUnordEqual: return "OpFUnordEqual"; break;
-    case saOp_FOrdNotEqual: return "OpFOrdNotEqual"; break;
-    case saOp_FUnordNotEqual: return "OpFUnordNotEqual"; break;
-    case saOp_FOrdLessThan: return "OpFOrdLessThan"; break;
-    case saOp_FUnordLessThan: return "OpFUnordLessThan"; break;
-    case saOp_FOrdGreaterThan: return "OpFOrdGreaterThan"; break;
-    case saOp_FUnordGreaterThan: return "OpFUnordGreaterThan"; break;
-    case saOp_FOrdLessThanEqual: return "OpFOrdLessThanEqual"; break;
-    case saOp_FUnordLessThanEqual: return "OpFUnordLessThanEqual"; break;
-    case saOp_FOrdGreaterThanEqual: return "OpFOrdGreaterThanEqual"; break;
-    case saOp_FUnordGreaterThanEqual: return "OpFUnordGreaterThanEqual"; break;
-    case saOp_ShiftRightLogical: return "OpShiftRightLogical"; break;
-    case saOp_ShiftRightArithmetic: return "OpShiftRightArithmetic"; break;
-    case saOp_ShiftLeftLogical: return "OpShiftLeftLogical"; break;
-    case saOp_BitwiseOr: return "OpBitwiseOr"; break;
-    case saOp_BitwiseXor: return "OpBitwiseXor"; break;
-    case saOp_BitwiseAnd: return "OpBitwiseAnd"; break;
-    case saOp_Not: return "OpNot"; break;
-    case saOp_BitFieldInsert: return "OpBitFieldInsert"; break;
-    case saOp_BitFieldSExtract: return "OpBitFieldSExtract"; break;
-    case saOp_BitFieldUExtract: return "OpBitFieldUExtract"; break;
-    case saOp_BitReverse: return "OpBitReverse"; break;
-    case saOp_BitCount: return "OpBitCount"; break;
-    case saOp_DPdx: return "OpDPdx"; break;
-    case saOp_DPdy: return "OpDPdy"; break;
-    case saOp_Fwidth: return "OpFwidth"; break;
-    case saOp_DPdxFine: return "OpDPdxFine"; break;
-    case saOp_DPdyFine: return "OpDPdyFine"; break;
-    case saOp_FwidthFine: return "OpFwidthFine"; break;
-    case saOp_DPdxCoarse: return "OpDPdxCoarse"; break;
-    case saOp_DPdyCoarse: return "OpDPdyCoarse"; break;
-    case saOp_FwidthCoarse: return "OpFwidthCoarse"; break;
-    case saOp_EmitVertex: return "OpEmitVertex"; break;
-    case saOp_EndPrimitive: return "OpEndPrimitive"; break;
-    case saOp_EmitStreamVertex: return "OpEmitStreamVertex"; break;
-    case saOp_EndStreamPrimitive: return "OpEndStreamPrimitive"; break;
-    case saOp_ControlBarrier: return "OpControlBarrier"; break;
-    case saOp_MemoryBarrier: return "OpMemoryBarrier"; break;
-    case saOp_AtomicLoad: return "OpAtomicLoad"; break;
-    case saOp_AtomicStore: return "OpAtomicStore"; break;
-    case saOp_AtomicExchange: return "OpAtomicExchange"; break;
-    case saOp_AtomicCompareExchange: return "OpAtomicCompareExchange"; break;
-    case saOp_AtomicCompareExchangeWeak: return "OpAtomicCompareExchangeWeak"; break;
-    case saOp_AtomicIIncrement: return "OpAtomicIIncrement"; break;
-    case saOp_AtomicIDecrement: return "OpAtomicIDecrement"; break;
-    case saOp_AtomicIAdd: return "OpAtomicIAdd"; break;
-    case saOp_AtomicISub: return "OpAtomicISub"; break;
-    case saOp_AtomicSMin: return "OpAtomicSMin"; break;
-    case saOp_AtomicUMin: return "OpAtomicUMin"; break;
-    case saOp_AtomicSMax: return "OpAtomicSMax"; break;
-    case saOp_AtomicUMax: return "OpAtomicUMax"; break;
-    case saOp_AtomicAnd: return "OpAtomicAnd"; break;
-    case saOp_AtomicOr: return "OpAtomicOr"; break;
-    case saOp_AtomicXor: return "OpAtomicXor"; break;
-    case saOp_Phi: return "OpPhi"; break;
-    case saOp_LoopMerge: return "OpLoopMerge"; break;
-    case saOp_SelectionMerge: return "OpSelectionMerge"; break;
-    case saOp_Label: return "OpLabel"; break;
-    case saOp_Branch: return "OpBranch"; break;
-    case saOp_BranchConditional: return "OpBranchConditional"; break;
-    case saOp_Switch: return "OpSwitch"; break;
-    case saOp_Kill: return "OpKill"; break;
-    case saOp_Return: return "OpReturn"; break;
-    case saOp_ReturnValue: return "OpReturnValue"; break;
-    case saOp_Unreachable: return "OpUnreachable"; break;
-    case saOp_LifetimeStart: return "OpLifetimeStart"; break;
-    case saOp_LifetimeStop: return "OpLifetimeStop"; break;
-    case saOp_GroupAsyncCopy: return "OpGroupAsyncCopy"; break;
-    case saOp_GroupWaitEvents: return "OpGroupWaitEvents"; break;
-    case saOp_GroupAll: return "OpGroupAll"; break;
-    case saOp_GroupAny: return "OpGroupAny"; break;
-    case saOp_GroupBroadcast: return "OpGroupBroadcast"; break;
-    case saOp_GroupIAdd: return "OpGroupIAdd"; break;
-    case saOp_GroupFAdd: return "OpGroupFAdd"; break;
-    case saOp_GroupFMin: return "OpGroupFMin"; break;
-    case saOp_GroupUMin: return "OpGroupUMin"; break;
-    case saOp_GroupSMin: return "OpGroupSMin"; break;
-    case saOp_GroupFMax: return "OpGroupFMax"; break;
-    case saOp_GroupUMax: return "OpGroupUMax"; break;
-    case saOp_GroupSMax: return "OpGroupSMax"; break;
-    case saOp_ReadPipe: return "OpReadPipe"; break;
-    case saOp_WritePipe: return "OpWritePipe"; break;
-    case saOp_ReservedReadPipe: return "OpReservedReadPipe"; break;
-    case saOp_ReservedWritePipe: return "OpReservedWritePipe"; break;
-    case saOp_ReservedReadPipePackets: return "OpReservedReadPipePackets"; break;
-    case saOp_ReservedWritePipePackets: return "OpReservedWritePipePackets"; break;
-    case saOp_CommitReadPipe: return "OpCommitReadPipe"; break;
-    case saOp_CommitWritePipe: return "OpCommitWritePipe"; break;
-    case saOp_IsValidReservedId: return "OpIsValidReservedId"; break;
-    case saOp_GetNumPipePackets: return "OpGetNumPipePackets"; break;
-    case saOp_GetMaxPipePackets: return "OpGetMaxPipePackets"; break;
-    case saOp_GroupReserveReadPipePackets: return "OpGroupReserveReadPipePackets"; break;
-    case saOp_GroupReserveWritePipePackets: return "OpGroupReserveWritePipePackets"; break;
-    case saOp_GroupCommitReadPipe: return "OpGroupCommitReadPipe"; break;
-    case saOp_GroupCommitWritePipe: return "OpGroupCommitWritePipe"; break;
-    case saOp_EnqueueMarker: return "OpEnqueueMarker"; break;
-    case saOp_EnqueueKernel: return "OpEnqueueKernel"; break;
-    case saOp_GetKernelINDrangeSubGroupCount: return "OpGetKernelINDrangeSubGroupCount"; break;
-    case saOp_GetKernelINDrangeMaxSubGroupSize: return "OpGetKernelINDrangeMaxSubGroupSize"; break;
-    case saOp_GetKernelIWorkGroupSize: return "OpGetKernelIWorkGroupSize"; break;
-    case saOp_GetKernelIPreferredWorkGroupSizeMultiple: return "OpGetKernelIPreferredWorkGroupSizeMultiple"; break;
-    case saOp_RetainEvent: return "OpRetainEvent"; break;
-    case saOp_ReleaseEvent: return "OpReleaseEvent"; break;
-    case saOp_CreateUserEvent: return "OpCreateUserEvent"; break;
-    case saOp_IsValidEvent: return "OpIsValidEvent"; break;
-    case saOp_SetUserEventStatus: return "OpSetUserEventStatus"; break;
-    case saOp_CaptureEventProfilingInfo: return "OpCaptureEventProfilingInfo"; break;
-    case saOp_GetDefaultQueue: return "OpGetDefaultQueue"; break;
-    case saOp_BuildNDRange: return "OpBuildNDRange"; break;
-    case saOp_ImageSparseSampleImplicitLod: return "OpImageSparseSampleImplicitLod"; break;
-    case saOp_ImageSparseSampleExplicitLod: return "OpImageSparseSampleExplicitLod"; break;
-    case saOp_ImageSparseSampleDrefImplicitLod: return "OpImageSparseSampleDrefImplicitLod"; break;
-    case saOp_ImageSparseSampleDrefExplicitLod: return "OpImageSparseSampleDrefExplicitLod"; break;
-    case saOp_ImageSparseFetch: return "OpImageSparseFetch"; break;
-    case saOp_ImageSparseGather: return "OpImageSparseGather"; break;
-    case saOp_ImageSparseDrefGather: return "OpImageSparseDrefGather"; break;
-    case saOp_ImageSparseTexelResident: return "OpImageSparseTexelResident"; break;
-    case saOp_NoLine: return "OpNoLine"; break;
-    case saOp_AtomicFlagTestAndSet: return "OpAtomicFlagTestAndSet"; break;
-    case saOp_AtomicFlagClear: return "OpAtomicFlagClear"; break;
-    case saOp_ImageSparseRead: return "OpImageSparseRead"; break;
-    case saOp_SizeOf: return "OpSizeOf"; break;
-    case saOp_TypePipeStorage: return "OpTypePipeStorage"; break;
-    case saOp_ConstantPipeStorage: return "OpConstantPipeStorage"; break;
-    case saOp_CreatePipeFromPipeStorage: return "OpCreatePipeFromPipeStorage"; break;
-    case saOp_GetKernelLocalSizeForSubgroupCount: return "OpGetKernelLocalSizeForSubgroupCount"; break;
-    case saOp_GetKernelMaxNumSubgroups: return "OpGetKernelMaxNumSubgroups"; break;
-    case saOp_TypeNamedBarrier: return "OpTypeNamedBarrier"; break;
-    case saOp_NamedBarrierInitialize: return "OpNamedBarrierInitialize"; break;
-    case saOp_MemoryNamedBarrier: return "OpMemoryNamedBarrier"; break;
-    case saOp_ModuleProcessed: return "OpModuleProcessed"; break;
-    case saOp_ExecutionModeId: return "OpExecutionModeId"; break;
-    case saOp_DecorateId: return "OpDecorateId"; break;
-    case saOp_GroupNonUniformElect: return "OpGroupNonUniformElect"; break;
-    case saOp_GroupNonUniformAll: return "OpGroupNonUniformAll"; break;
-    case saOp_GroupNonUniformAny: return "OpGroupNonUniformAny"; break;
-    case saOp_GroupNonUniformAllEqual: return "OpGroupNonUniformAllEqual"; break;
-    case saOp_GroupNonUniformBroadcast: return "OpGroupNonUniformBroadcast"; break;
-    case saOp_GroupNonUniformBroadcastFirst: return "OpGroupNonUniformBroadcastFirst"; break;
-    case saOp_GroupNonUniformBallot: return "OpGroupNonUniformBallot"; break;
-    case saOp_GroupNonUniformInverseBallot: return "OpGroupNonUniformInverseBallot"; break;
-    case saOp_GroupNonUniformBallotBitExtract: return "OpGroupNonUniformBallotBitExtract"; break;
-    case saOp_GroupNonUniformBallotBitCount: return "OpGroupNonUniformBallotBitCount"; break;
-    case saOp_GroupNonUniformBallotFindLSB: return "OpGroupNonUniformBallotFindLSB"; break;
-    case saOp_GroupNonUniformBallotFindMSB: return "OpGroupNonUniformBallotFindMSB"; break;
-    case saOp_GroupNonUniformShuffle: return "OpGroupNonUniformShuffle"; break;
-    case saOp_GroupNonUniformShuffleXor: return "OpGroupNonUniformShuffleXor"; break;
-    case saOp_GroupNonUniformShuffleUp: return "OpGroupNonUniformShuffleUp"; break;
-    case saOp_GroupNonUniformShuffleDown: return "OpGroupNonUniformShuffleDown"; break;
-    case saOp_GroupNonUniformIAdd: return "OpGroupNonUniformIAdd"; break;
-    case saOp_GroupNonUniformFAdd: return "OpGroupNonUniformFAdd"; break;
-    case saOp_GroupNonUniformIMul: return "OpGroupNonUniformIMul"; break;
-    case saOp_GroupNonUniformFMul: return "OpGroupNonUniformFMul"; break;
-    case saOp_GroupNonUniformSMin: return "OpGroupNonUniformSMin"; break;
-    case saOp_GroupNonUniformUMin: return "OpGroupNonUniformUMin"; break;
-    case saOp_GroupNonUniformFMin: return "OpGroupNonUniformFMin"; break;
-    case saOp_GroupNonUniformSMax: return "OpGroupNonUniformSMax"; break;
-    case saOp_GroupNonUniformUMax: return "OpGroupNonUniformUMax"; break;
-    case saOp_GroupNonUniformFMax: return "OpGroupNonUniformFMax"; break;
-    case saOp_GroupNonUniformBitwiseAnd: return "OpGroupNonUniformBitwiseAnd"; break;
-    case saOp_GroupNonUniformBitwiseOr: return "OpGroupNonUniformBitwiseOr"; break;
-    case saOp_GroupNonUniformBitwiseXor: return "OpGroupNonUniformBitwiseXor"; break;
-    case saOp_GroupNonUniformLogicalAnd: return "OpGroupNonUniformLogicalAnd"; break;
-    case saOp_GroupNonUniformLogicalOr: return "OpGroupNonUniformLogicalOr"; break;
-    case saOp_GroupNonUniformLogicalXor: return "OpGroupNonUniformLogicalXor"; break;
-    case saOp_GroupNonUniformQuadBroadcast: return "OpGroupNonUniformQuadBroadcast"; break;
-    case saOp_GroupNonUniformQuadSwap: return "OpGroupNonUniformQuadSwap"; break;
-    case saOp_CopyLogical: return "OpCopyLogical"; break;
-    case saOp_PtrEqual: return "OpPtrEqual"; break;
-    case saOp_PtrNotEqual: return "OpPtrNotEqual"; break;
-    case saOp_PtrDiff: return "OpPtrDiff"; break;  
+    case saOp_Nop: return "Nop"; break;
+    case saOp_Undef: return "Undef"; break;
+    case saOp_SourceContinued: return "SourceContinued"; break;
+    case saOp_Source: return "Source"; break;
+    case saOp_SourceExtension: return "SourceExtension"; break;
+    case saOp_Name: return "Name"; break;
+    case saOp_MemberName: return "MemberName"; break;
+    case saOp_String: return "String"; break;
+    case saOp_Line: return "Line"; break;
+    case saOp_Extension: return "Extension"; break;
+    case saOp_ExtInstImport: return "ExtInstImport"; break;
+    case saOp_ExtInst: return "ExtInst"; break;
+    case saOp_MemoryModel: return "MemoryModel"; break;
+    case saOp_EntryPoint: return "EntryPoint"; break;
+    case saOp_ExecutionMode: return "ExecutionMode"; break;
+    case saOp_Capability: return "Capability"; break;
+    case saOp_TypeVoid: return "TypeVoid"; break;
+    case saOp_TypeBool: return "TypeBool"; break;
+    case saOp_TypeInt: return "TypeInt"; break;
+    case saOp_TypeFloat: return "TypeFloat"; break;
+    case saOp_TypeVector: return "TypeVector"; break;
+    case saOp_TypeMatrix: return "TypeMatrix"; break;
+    case saOp_TypeImage: return "TypeImage"; break;
+    case saOp_TypeSampler: return "TypeSampler"; break;
+    case saOp_TypeSampledImage: return "TypeSampledImage"; break;
+    case saOp_TypeArray: return "TypeArray"; break;
+    case saOp_TypeRuntimeArray: return "TypeRuntimeArray"; break;
+    case saOp_TypeStruct: return "TypeStruct"; break;
+    case saOp_TypeOpaque: return "TypeOpaque"; break;
+    case saOp_TypePointer: return "TypePointer"; break;
+    case saOp_TypeFunction: return "TypeFunction"; break;
+    case saOp_TypeEvent: return "TypeEvent"; break;
+    case saOp_TypeDeviceEvent: return "TypeDeviceEvent"; break;
+    case saOp_TypeReserveId: return "TypeReserveId"; break;
+    case saOp_TypeQueue: return "TypeQueue"; break;
+    case saOp_TypePipe: return "TypePipe"; break;
+    case saOp_TypeForwardPointer: return "TypeForwardPointer"; break;
+    case saOp_ConstantTrue: return "ConstantTrue"; break;
+    case saOp_ConstantFalse: return "ConstantFalse"; break;
+    case saOp_Constant: return "Constant"; break;
+    case saOp_ConstantComposite: return "ConstantComposite"; break;
+    case saOp_ConstantSampler: return "ConstantSampler"; break;
+    case saOp_ConstantNull: return "ConstantNull"; break;
+    case saOp_SpecConstantTrue: return "SpecConstantTrue"; break;
+    case saOp_SpecConstantFalse: return "SpecConstantFalse"; break;
+    case saOp_SpecConstant: return "SpecConstant"; break;
+    case saOp_SpecConstantComposite: return "SpecConstantComposite"; break;
+    case saOp_SpecConstantOp: return "SpecConstantOp"; break;
+    case saOp_Function: return "Function"; break;
+    case saOp_FunctionParameter: return "FunctionParameter"; break;
+    case saOp_FunctionEnd: return "FunctionEnd"; break;
+    case saOp_FunctionCall: return "FunctionCall"; break;
+    case saOp_Variable: return "Variable"; break;
+    case saOp_ImageTexelPointer: return "ImageTexelPointer"; break;
+    case saOp_Load: return "Load"; break;
+    case saOp_Store: return "Store"; break;
+    case saOp_CopyMemory: return "CopyMemory"; break;
+    case saOp_CopyMemorySized: return "CopyMemorySized"; break;
+    case saOp_AccessChain: return "AccessChain"; break;
+    case saOp_InBoundsAccessChain: return "InBoundsAccessChain"; break;
+    case saOp_PtrAccessChain: return "PtrAccessChain"; break;
+    case saOp_ArrayLength: return "ArrayLength"; break;
+    case saOp_GenericPtrMemSemantics: return "GenericPtrMemSemantics"; break;
+    case saOp_InBoundsPtrAccessChain: return "InBoundsPtrAccessChain"; break;
+    case saOp_Decorate: return "Decorate"; break;
+    case saOp_MemberDecorate: return "MemberDecorate"; break;
+    case saOp_DecorationGroup: return "DecorationGroup"; break;
+    case saOp_GroupDecorate: return "GroupDecorate"; break;
+    case saOp_GroupMemberDecorate: return "GroupMemberDecorate"; break;
+    case saOp_VectorExtractDynamic: return "VectorExtractDynamic"; break;
+    case saOp_VectorInsertDynamic: return "VectorInsertDynamic"; break;
+    case saOp_VectorShuffle: return "VectorShuffle"; break;
+    case saOp_CompositeConstruct: return "CompositeConstruct"; break;
+    case saOp_CompositeExtract: return "CompositeExtract"; break;
+    case saOp_CompositeInsert: return "CompositeInsert"; break;
+    case saOp_CopyObject: return "CopyObject"; break;
+    case saOp_Transpose: return "Transpose"; break;
+    case saOp_SampledImage: return "SampledImage"; break;
+    case saOp_ImageSampleImplicitLod: return "ImageSampleImplicitLod"; break;
+    case saOp_ImageSampleExplicitLod: return "ImageSampleExplicitLod"; break;
+    case saOp_ImageSampleDrefImplicitLod: return "ImageSampleDrefImplicitLod"; break;
+    case saOp_ImageSampleDrefExplicitLod: return "ImageSampleDrefExplicitLod"; break;
+    case saOp_ImageSampleProjImplicitLod: return "ImageSampleProjImplicitLod"; break;
+    case saOp_ImageSampleProjExplicitLod: return "ImageSampleProjExplicitLod"; break;
+    case saOp_ImageSampleProjDrefImplicitLod: return "ImageSampleProjDrefImplicitLod"; break;
+    case saOp_ImageSampleProjDrefExplicitLod: return "ImageSampleProjDrefExplicitLod"; break;
+    case saOp_ImageFetch: return "ImageFetch"; break;
+    case saOp_ImageGather: return "ImageGather"; break;
+    case saOp_ImageDrefGather: return "ImageDrefGather"; break;
+    case saOp_ImageRead: return "ImageRead"; break;
+    case saOp_ImageWrite: return "ImageWrite"; break;
+    case saOp_Image: return "Image"; break;
+    case saOp_ImageQueryFormat: return "ImageQueryFormat"; break;
+    case saOp_ImageQueryOrder: return "ImageQueryOrder"; break;
+    case saOp_ImageQuerySizeLod: return "ImageQuerySizeLod"; break;
+    case saOp_ImageQuerySize: return "ImageQuerySize"; break;
+    case saOp_ImageQueryLod: return "ImageQueryLod"; break;
+    case saOp_ImageQueryLevels: return "ImageQueryLevels"; break;
+    case saOp_ImageQuerySamples: return "ImageQuerySamples"; break;
+    case saOp_ConvertFToU: return "ConvertFToU"; break;
+    case saOp_ConvertFToS: return "ConvertFToS"; break;
+    case saOp_ConvertSToF: return "ConvertSToF"; break;
+    case saOp_ConvertUToF: return "ConvertUToF"; break;
+    case saOp_UConvert: return "UConvert"; break;
+    case saOp_SConvert: return "SConvert"; break;
+    case saOp_FConvert: return "FConvert"; break;
+    case saOp_QuantizeToF16: return "QuantizeToF16"; break;
+    case saOp_ConvertPtrToU: return "ConvertPtrToU"; break;
+    case saOp_SatConvertSToU: return "SatConvertSToU"; break;
+    case saOp_SatConvertUToS: return "SatConvertUToS"; break;
+    case saOp_ConvertUToPtr: return "ConvertUToPtr"; break;
+    case saOp_PtrCastToGeneric: return "PtrCastToGeneric"; break;
+    case saOp_GenericCastToPtr: return "GenericCastToPtr"; break;
+    case saOp_GenericCastToPtrExplicit: return "GenericCastToPtrExplicit"; break;
+    case saOp_Bitcast: return "Bitcast"; break;
+    case saOp_SNegate: return "SNegate"; break;
+    case saOp_FNegate: return "FNegate"; break;
+    case saOp_IAdd: return "IAdd"; break;
+    case saOp_FAdd: return "FAdd"; break;
+    case saOp_ISub: return "ISub"; break;
+    case saOp_FSub: return "FSub"; break;
+    case saOp_IMul: return "IMul"; break;
+    case saOp_FMul: return "FMul"; break;
+    case saOp_UDiv: return "UDiv"; break;
+    case saOp_SDiv: return "SDiv"; break;
+    case saOp_FDiv: return "FDiv"; break;
+    case saOp_UMul: return "UMul"; break;
+    case saOp_SRem: return "SRem"; break;
+    case saOp_SMod: return "SMod"; break;
+    case saOp_FRem: return "FRem"; break;
+    case saOp_FMod: return "FMod"; break;
+    case saOp_VectorTimesScalar: return "VectorTimesScalar"; break;
+    case saOp_MatrixTimesScalar: return "MatrixTimesScalar"; break;
+    case saOp_VectorTimesMatrix: return "VectorTimesMatrix"; break;
+    case saOp_MatrixTimesVector: return "MatrixTimesVector"; break;
+    case saOp_MatrixTimesMatrix: return "MatrixTimesMatrix"; break;
+    case saOp_OuterProduct: return "OuterProduct"; break;
+    case saOp_Dot: return "Dot"; break;
+    case saOp_IAddCarry: return "IAddCarry"; break;
+    case saOp_ISubBorrow: return "ISubBorrow"; break;
+    case saOp_UMulExtended: return "UMulExtended"; break;
+    case saOp_SMulExtended: return "SMulExtended"; break;
+    case saOp_Any: return "Any"; break;
+    case saOp_All: return "All"; break;
+    case saOp_IsNan: return "IsNan"; break;
+    case saOp_IsInf: return "IsInf"; break;
+    case saOp_IsFinite: return "IsFinite"; break;
+    case saOp_IsNormal: return "IsNormal"; break;
+    case saOp_SignBitSet: return "SignBitSet"; break;
+    case saOp_LessOrGreater: return "LessOrGreater"; break;
+    case saOp_Ordered: return "Ordered"; break;
+    case saOp_Unordered: return "Unordered"; break;
+    case saOp_LogicalEqual: return "LogicalEqual"; break;
+    case saOp_LogicalNotEqual: return "LogicalNotEqual"; break;
+    case saOp_LogicalOr: return "LogicalOr"; break;
+    case saOp_LogicalAnd: return "LogicalAnd"; break;
+    case saOp_LogicalNot: return "LogicalNot"; break;
+    case saOp_Select: return "Select"; break;
+    case saOp_IEqual: return "IEqual"; break;
+    case saOp_INotEqual: return "INotEqual"; break;
+    case saOp_UGreaterThan: return "UGreaterThan"; break;
+    case saOp_SGreaterThan: return "SGreaterThan"; break;
+    case saOp_UGreaterThanEqual: return "UGreaterThanEqual"; break;
+    case saOp_SGreaterThanEqual: return "SGreaterThanEqual"; break;
+    case saOp_ULessThan: return "ULessThan"; break;
+    case saOp_SLessThan: return "SLessThan"; break;
+    case saOp_ULessThanEqual: return "ULessThanEqual"; break;
+    case saOp_SLessThanEqual: return "SLessThanEqual"; break;
+    case saOp_FOrdEqual: return "FOrdEqual"; break;
+    case saOp_FUnordEqual: return "FUnordEqual"; break;
+    case saOp_FOrdNotEqual: return "FOrdNotEqual"; break;
+    case saOp_FUnordNotEqual: return "FUnordNotEqual"; break;
+    case saOp_FOrdLessThan: return "FOrdLessThan"; break;
+    case saOp_FUnordLessThan: return "FUnordLessThan"; break;
+    case saOp_FOrdGreaterThan: return "FOrdGreaterThan"; break;
+    case saOp_FUnordGreaterThan: return "FUnordGreaterThan"; break;
+    case saOp_FOrdLessThanEqual: return "FOrdLessThanEqual"; break;
+    case saOp_FUnordLessThanEqual: return "FUnordLessThanEqual"; break;
+    case saOp_FOrdGreaterThanEqual: return "FOrdGreaterThanEqual"; break;
+    case saOp_FUnordGreaterThanEqual: return "FUnordGreaterThanEqual"; break;
+    case saOp_ShiftRightLogical: return "ShiftRightLogical"; break;
+    case saOp_ShiftRightArithmetic: return "ShiftRightArithmetic"; break;
+    case saOp_ShiftLeftLogical: return "ShiftLeftLogical"; break;
+    case saOp_BitwiseOr: return "BitwiseOr"; break;
+    case saOp_BitwiseXor: return "BitwiseXor"; break;
+    case saOp_BitwiseAnd: return "BitwiseAnd"; break;
+    case saOp_Not: return "Not"; break;
+    case saOp_BitFieldInsert: return "BitFieldInsert"; break;
+    case saOp_BitFieldSExtract: return "BitFieldSExtract"; break;
+    case saOp_BitFieldUExtract: return "BitFieldUExtract"; break;
+    case saOp_BitReverse: return "BitReverse"; break;
+    case saOp_BitCount: return "BitCount"; break;
+    case saOp_DPdx: return "DPdx"; break;
+    case saOp_DPdy: return "DPdy"; break;
+    case saOp_Fwidth: return "Fwidth"; break;
+    case saOp_DPdxFine: return "DPdxFine"; break;
+    case saOp_DPdyFine: return "DPdyFine"; break;
+    case saOp_FwidthFine: return "FwidthFine"; break;
+    case saOp_DPdxCoarse: return "DPdxCoarse"; break;
+    case saOp_DPdyCoarse: return "DPdyCoarse"; break;
+    case saOp_FwidthCoarse: return "FwidthCoarse"; break;
+    case saOp_EmitVertex: return "EmitVertex"; break;
+    case saOp_EndPrimitive: return "EndPrimitive"; break;
+    case saOp_EmitStreamVertex: return "EmitStreamVertex"; break;
+    case saOp_EndStreamPrimitive: return "EndStreamPrimitive"; break;
+    case saOp_ControlBarrier: return "ControlBarrier"; break;
+    case saOp_MemoryBarrier: return "MemoryBarrier"; break;
+    case saOp_AtomicLoad: return "AtomicLoad"; break;
+    case saOp_AtomicStore: return "AtomicStore"; break;
+    case saOp_AtomicExchange: return "AtomicExchange"; break;
+    case saOp_AtomicCompareExchange: return "AtomicCompareExchange"; break;
+    case saOp_AtomicCompareExchangeWeak: return "AtomicCompareExchangeWeak"; break;
+    case saOp_AtomicIIncrement: return "AtomicIIncrement"; break;
+    case saOp_AtomicIDecrement: return "AtomicIDecrement"; break;
+    case saOp_AtomicIAdd: return "AtomicIAdd"; break;
+    case saOp_AtomicISub: return "AtomicISub"; break;
+    case saOp_AtomicSMin: return "AtomicSMin"; break;
+    case saOp_AtomicUMin: return "AtomicUMin"; break;
+    case saOp_AtomicSMax: return "AtomicSMax"; break;
+    case saOp_AtomicUMax: return "AtomicUMax"; break;
+    case saOp_AtomicAnd: return "AtomicAnd"; break;
+    case saOp_AtomicOr: return "AtomicOr"; break;
+    case saOp_AtomicXor: return "AtomicXor"; break;
+    case saOp_Phi: return "Phi"; break;
+    case saOp_LoopMerge: return "LoopMerge"; break;
+    case saOp_SelectionMerge: return "SelectionMerge"; break;
+    case saOp_Label: return "Label"; break;
+    case saOp_Branch: return "Branch"; break;
+    case saOp_BranchConditional: return "BranchConditional"; break;
+    case saOp_Switch: return "Switch"; break;
+    case saOp_Kill: return "Kill"; break;
+    case saOp_Return: return "Return"; break;
+    case saOp_ReturnValue: return "ReturnValue"; break;
+    case saOp_Unreachable: return "Unreachable"; break;
+    case saOp_LifetimeStart: return "LifetimeStart"; break;
+    case saOp_LifetimeStop: return "LifetimeStop"; break;
+    case saOp_GroupAsyncCopy: return "GroupAsyncCopy"; break;
+    case saOp_GroupWaitEvents: return "GroupWaitEvents"; break;
+    case saOp_GroupAll: return "GroupAll"; break;
+    case saOp_GroupAny: return "GroupAny"; break;
+    case saOp_GroupBroadcast: return "GroupBroadcast"; break;
+    case saOp_GroupIAdd: return "GroupIAdd"; break;
+    case saOp_GroupFAdd: return "GroupFAdd"; break;
+    case saOp_GroupFMin: return "GroupFMin"; break;
+    case saOp_GroupUMin: return "GroupUMin"; break;
+    case saOp_GroupSMin: return "GroupSMin"; break;
+    case saOp_GroupFMax: return "GroupFMax"; break;
+    case saOp_GroupUMax: return "GroupUMax"; break;
+    case saOp_GroupSMax: return "GroupSMax"; break;
+    case saOp_ReadPipe: return "ReadPipe"; break;
+    case saOp_WritePipe: return "WritePipe"; break;
+    case saOp_ReservedReadPipe: return "ReservedReadPipe"; break;
+    case saOp_ReservedWritePipe: return "ReservedWritePipe"; break;
+    case saOp_ReservedReadPipePackets: return "ReservedReadPipePackets"; break;
+    case saOp_ReservedWritePipePackets: return "ReservedWritePipePackets"; break;
+    case saOp_CommitReadPipe: return "CommitReadPipe"; break;
+    case saOp_CommitWritePipe: return "CommitWritePipe"; break;
+    case saOp_IsValidReservedId: return "IsValidReservedId"; break;
+    case saOp_GetNumPipePackets: return "GetNumPipePackets"; break;
+    case saOp_GetMaxPipePackets: return "GetMaxPipePackets"; break;
+    case saOp_GroupReserveReadPipePackets: return "GroupReserveReadPipePackets"; break;
+    case saOp_GroupReserveWritePipePackets: return "GroupReserveWritePipePackets"; break;
+    case saOp_GroupCommitReadPipe: return "GroupCommitReadPipe"; break;
+    case saOp_GroupCommitWritePipe: return "GroupCommitWritePipe"; break;
+    case saOp_EnqueueMarker: return "EnqueueMarker"; break;
+    case saOp_EnqueueKernel: return "EnqueueKernel"; break;
+    case saOp_GetKernelINDrangeSubGroupCount: return "GetKernelINDrangeSubGroupCount"; break;
+    case saOp_GetKernelINDrangeMaxSubGroupSize: return "GetKernelINDrangeMaxSubGroupSize"; break;
+    case saOp_GetKernelIWorkGroupSize: return "GetKernelIWorkGroupSize"; break;
+    case saOp_GetKernelIPreferredWorkGroupSizeMultiple: return "GetKernelIPreferredWorkGroupSizeMultiple"; break;
+    case saOp_RetainEvent: return "RetainEvent"; break;
+    case saOp_ReleaseEvent: return "ReleaseEvent"; break;
+    case saOp_CreateUserEvent: return "CreateUserEvent"; break;
+    case saOp_IsValidEvent: return "IsValidEvent"; break;
+    case saOp_SetUserEventStatus: return "SetUserEventStatus"; break;
+    case saOp_CaptureEventProfilingInfo: return "CaptureEventProfilingInfo"; break;
+    case saOp_GetDefaultQueue: return "GetDefaultQueue"; break;
+    case saOp_BuildNDRange: return "BuildNDRange"; break;
+    case saOp_ImageSparseSampleImplicitLod: return "ImageSparseSampleImplicitLod"; break;
+    case saOp_ImageSparseSampleExplicitLod: return "ImageSparseSampleExplicitLod"; break;
+    case saOp_ImageSparseSampleDrefImplicitLod: return "ImageSparseSampleDrefImplicitLod"; break;
+    case saOp_ImageSparseSampleDrefExplicitLod: return "ImageSparseSampleDrefExplicitLod"; break;
+    case saOp_ImageSparseFetch: return "ImageSparseFetch"; break;
+    case saOp_ImageSparseGather: return "ImageSparseGather"; break;
+    case saOp_ImageSparseDrefGather: return "ImageSparseDrefGather"; break;
+    case saOp_ImageSparseTexelResident: return "ImageSparseTexelResident"; break;
+    case saOp_NoLine: return "NoLine"; break;
+    case saOp_AtomicFlagTestAndSet: return "AtomicFlagTestAndSet"; break;
+    case saOp_AtomicFlagClear: return "AtomicFlagClear"; break;
+    case saOp_ImageSparseRead: return "ImageSparseRead"; break;
+    case saOp_SizeOf: return "SizeOf"; break;
+    case saOp_TypePipeStorage: return "TypePipeStorage"; break;
+    case saOp_ConstantPipeStorage: return "ConstantPipeStorage"; break;
+    case saOp_CreatePipeFromPipeStorage: return "CreatePipeFromPipeStorage"; break;
+    case saOp_GetKernelLocalSizeForSubgroupCount: return "GetKernelLocalSizeForSubgroupCount"; break;
+    case saOp_GetKernelMaxNumSubgroups: return "GetKernelMaxNumSubgroups"; break;
+    case saOp_TypeNamedBarrier: return "TypeNamedBarrier"; break;
+    case saOp_NamedBarrierInitialize: return "NamedBarrierInitialize"; break;
+    case saOp_MemoryNamedBarrier: return "MemoryNamedBarrier"; break;
+    case saOp_ModuleProcessed: return "ModuleProcessed"; break;
+    case saOp_ExecutionModeId: return "ExecutionModeId"; break;
+    case saOp_DecorateId: return "DecorateId"; break;
+    case saOp_GroupNonUniformElect: return "GroupNonUniformElect"; break;
+    case saOp_GroupNonUniformAll: return "GroupNonUniformAll"; break;
+    case saOp_GroupNonUniformAny: return "GroupNonUniformAny"; break;
+    case saOp_GroupNonUniformAllEqual: return "GroupNonUniformAllEqual"; break;
+    case saOp_GroupNonUniformBroadcast: return "GroupNonUniformBroadcast"; break;
+    case saOp_GroupNonUniformBroadcastFirst: return "GroupNonUniformBroadcastFirst"; break;
+    case saOp_GroupNonUniformBallot: return "GroupNonUniformBallot"; break;
+    case saOp_GroupNonUniformInverseBallot: return "GroupNonUniformInverseBallot"; break;
+    case saOp_GroupNonUniformBallotBitExtract: return "GroupNonUniformBallotBitExtract"; break;
+    case saOp_GroupNonUniformBallotBitCount: return "GroupNonUniformBallotBitCount"; break;
+    case saOp_GroupNonUniformBallotFindLSB: return "GroupNonUniformBallotFindLSB"; break;
+    case saOp_GroupNonUniformBallotFindMSB: return "GroupNonUniformBallotFindMSB"; break;
+    case saOp_GroupNonUniformShuffle: return "GroupNonUniformShuffle"; break;
+    case saOp_GroupNonUniformShuffleXor: return "GroupNonUniformShuffleXor"; break;
+    case saOp_GroupNonUniformShuffleUp: return "GroupNonUniformShuffleUp"; break;
+    case saOp_GroupNonUniformShuffleDown: return "GroupNonUniformShuffleDown"; break;
+    case saOp_GroupNonUniformIAdd: return "GroupNonUniformIAdd"; break;
+    case saOp_GroupNonUniformFAdd: return "GroupNonUniformFAdd"; break;
+    case saOp_GroupNonUniformIMul: return "GroupNonUniformIMul"; break;
+    case saOp_GroupNonUniformFMul: return "GroupNonUniformFMul"; break;
+    case saOp_GroupNonUniformSMin: return "GroupNonUniformSMin"; break;
+    case saOp_GroupNonUniformUMin: return "GroupNonUniformUMin"; break;
+    case saOp_GroupNonUniformFMin: return "GroupNonUniformFMin"; break;
+    case saOp_GroupNonUniformSMax: return "GroupNonUniformSMax"; break;
+    case saOp_GroupNonUniformUMax: return "GroupNonUniformUMax"; break;
+    case saOp_GroupNonUniformFMax: return "GroupNonUniformFMax"; break;
+    case saOp_GroupNonUniformBitwiseAnd: return "GroupNonUniformBitwiseAnd"; break;
+    case saOp_GroupNonUniformBitwiseOr: return "GroupNonUniformBitwiseOr"; break;
+    case saOp_GroupNonUniformBitwiseXor: return "GroupNonUniformBitwiseXor"; break;
+    case saOp_GroupNonUniformLogicalAnd: return "GroupNonUniformLogicalAnd"; break;
+    case saOp_GroupNonUniformLogicalOr: return "GroupNonUniformLogicalOr"; break;
+    case saOp_GroupNonUniformLogicalXor: return "GroupNonUniformLogicalXor"; break;
+    case saOp_GroupNonUniformQuadBroadcast: return "GroupNonUniformQuadBroadcast"; break;
+    case saOp_GroupNonUniformQuadSwap: return "GroupNonUniformQuadSwap"; break;
+    case saOp_CopyLogical: return "CopyLogical"; break;
+    case saOp_PtrEqual: return "PtrEqual"; break;
+    case saOp_PtrNotEqual: return "PtrNotEqual"; break;
+    case saOp_PtrDiff: return "PtrDiff"; break;  
   }
 
   return "";
@@ -1772,6 +2517,16 @@ static const char* sa__sectionToString(sa_uint32_t section) {
   return "";
 }
 
+/**
+ * @brief Short whites are spaces or tabs
+ * 
+ * @param c 
+ * @return sa_bool 
+ */
+static sa_bool sa__isShortWhite(sa_uint8_t c) {
+  return c == ' ' || c == '\t';
+}
+
 static void* sa__copyMemory(const void* pSrc, void* pDst, sa_uint32_t size) {
   for(sa_uint32_t i = 0; i < size; i++) {
     sa_ptr8(pDst)[i] = sa_ptr8(pSrc)[i];
@@ -1789,17 +2544,16 @@ static void* sa__setMemory(void* pMem, int value, sa_uint32_t size) {
 }
 
 static sa_uint32_t sa__compareString(const char* a, const char* b) {
-  char* _a = (char*)a;
-  char* _b = (char*)b;
+  sa_uint32_t index = 0;
 
-  while(_a && _b) {
-    if(_a - _b != 0)
-      return _a - _b;
-    _a++;
-    _b++;
+  while(a[index] && b[index]) {
+    if(a[index] - b[index] != 0) 
+      return a[index] - b[index];
+
+    index++;
   }
 
-  return _a - _b;
+  return a[index] - b[index];
 }
 
 static sa_uint32_t sa__lengthString(const char* str) {
@@ -1811,15 +2565,78 @@ static sa_uint32_t sa__lengthString(const char* str) {
   return len;
 }
 
+static sa_bool sa__isCharDigit(sa_uint8_t c) {
+  return c >= '0' && c <= '9';
+}
+
+static sa_bool sa__isStringInteger(const char* str) {
+  for(sa_uint32_t i = 0; i < sa__lengthString(str); i++) {
+    if(!sa__isCharDigit(str[i]))
+      return SA_FALSE;
+  }
+  
+  return SA_TRUE;
+}
+
+static sa_bool sa__isStringFloat(const char* str) {
+  for(sa_uint32_t i = 0; i < sa__lengthString(str); i++) {
+    if(!sa__isCharDigit(str[i]) && str[i] != '.')
+      return SA_FALSE;
+  }
+  
+  return SA_TRUE;
+}
+
+static sa_int32_t sa__stringToInt(const char* str) {
+  char* p = (char*)&str[0];
+  sa_int32_t result = 0;
+
+  if(*p == '-')
+    p++;
+
+  while(*p && sa__isCharDigit(*p)) {
+    result *= 10;
+    result += *p - '0';
+    p++;
+  }
+
+  return str[0] == '-' ? -result : result;
+}
+
+static float sa__stringToFloat(const char* str) {
+  char* p = (char*)&str[0];
+  float left = 0.0f;
+  float right = 0.0f;
+
+  if(*p == '-')
+    p++;
+
+  while(*p && sa__isCharDigit(*p)) {
+    left *= 10.0f;
+    left += (float)(*p - '0');
+    p++;
+  }
+
+  if(*p == '.') {
+    while(*p && sa__isCharDigit(*p)) {
+      right += (float)(*p - '0');
+      right /= 10.0f;
+      p++;
+    }
+  }
+
+  return str[0] == '-' ? -(left + right) : (left + right);
+}
+
 static char* sa__intToString(sa_int32_t value) {
   static char str[32] = {0};
+
   sa__setMemory(str, 0, 32 * sizeof(char));
 
   sa_uint32_t num = value;
   sa_uint32_t numCounter = 0;
 
   if(num < 0) {
-    str[numCounter] = '-';
     numCounter++;
     num = -num;
   }
@@ -1835,6 +2652,9 @@ static char* sa__intToString(sa_int32_t value) {
     str[i] = str[numCounter - i];
     str[numCounter - i] = tmp;
   }
+
+  if(value < 0)
+    str[0] = '-';
 
   return str;
 }
@@ -1908,52 +2728,59 @@ static char* sa__floatToString(float value, int decimals) {
   return buf;
 }
 
+#include <stdio.h>
 static void sa__errMsg(const char* fmt, ...) {
+  printf("%\n", fmt);
+
   sa_uint32_t count = 0;
 
   for(sa_uint32_t i = 0; i < sa__lengthString(fmt); i++) {
     if(fmt[i] == '%')
-      count++;
+    count++;
   }
-  
+
   __gAssemblerErrorMessages.messagesAmount++;
   __gAssemblerErrorMessages.pMessages = (char**)sa_realloc(__gAssemblerErrorMessages.pMessages, sizeof(char*) * __gAssemblerErrorMessages.messagesAmount);
   // If you look closely at how this is handled, it is so unoptimally done
-  char* msg = __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1];
-
+  __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_malloc(sizeof(char));
+  
   va_list args;
   va_start(args, count);
-
+  
   sa_uint32_t msgSize = 0;
 
   for(sa_uint32_t i = 0; i < sa__lengthString(fmt); i++) {
     if(fmt[i] == '%') {
+      msgSize++;
+
       switch(fmt[i + 1]) {
       // Char
       case 'c':
         msgSize++;
-        msg = (char*)sa_realloc(msg, sizeof(char) * msgSize);
-        msg[msgSize - 1] = va_arg(args, char);
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - 1] = va_arg(args, char);
         break;
 
       // Int
       case 'd':
-        char* number = sa__intToString(va_arg(args, sa_int32_t));
+        sa_int32_t numberInt = va_arg(args, sa_int32_t); 
+        char* number = sa__intToString(numberInt);
         sa_uint32_t numLength = sa__lengthString(number);
 
         msgSize += numLength;
-        msg = (char*)sa_realloc(msg, sizeof(char) * msgSize);
-        sa__copyMemory(number, &msg[msgSize - numLength - 1], numLength);
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+        sa__copyMemory(number, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - numLength - 1], numLength);
         break;
 
       // Float
       case 'f':
-        char* fnumber = sa__floatToString(va_arg(args, float), 6);
+        float fnumberFloat = va_arg(args, float);
+        char* fnumber = sa__floatToString(fnumberFloat, 6);
         sa_uint32_t fnumLength = sa__lengthString(fnumber);
 
         msgSize += fnumLength;
-        msg = (char*)sa_realloc(msg, sizeof(char) * msgSize);
-        sa__copyMemory(fnumber, &msg[msgSize - fnumLength - 1], fnumLength);
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+        sa__copyMemory(fnumber, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - fnumLength - 1], fnumLength);
         break;
 
       // String
@@ -1962,25 +2789,26 @@ static void sa__errMsg(const char* fmt, ...) {
         sa_uint32_t length = sa__lengthString(string);
 
         msgSize += length;
-        msg = (char*)sa_realloc(msg, sizeof(char) * msgSize);
-        sa__copyMemory(string, &msg[msgSize - length - 1], length);
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+        sa__copyMemory(string, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - length - 1], length);
         break;
 
       // Hex
       case 'x':
-        char* hnumber = sa__hexToString(va_arg(args, sa_uint32_t));
+        sa_uint32_t hnumberUint = va_arg(args, sa_uint32_t); 
+        char* hnumber = sa__hexToString(hnumberUint);
         sa_uint32_t hnumLength = sa__lengthString(hnumber);
 
         msgSize += hnumLength;
-        msg = (char*)sa_realloc(msg, sizeof(char) * msgSize);
-        sa__copyMemory(hnumber, &msg[msgSize - hnumLength - 1], hnumLength);
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+        sa__copyMemory(hnumber, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - hnumLength - 1], hnumLength);
         break;
 
       // The percent chacarter
       case '%':
         msgSize++;
-        msg = (char*)sa_realloc(msg, sizeof(char) * msgSize);
-        msg[msgSize - 1] = '%';
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+        __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - 1] = '%';
         break;
 
       default:
@@ -1988,10 +2816,12 @@ static void sa__errMsg(const char* fmt, ...) {
       }
 
       i += 2;
+      msgSize--;
     }
 
-    msg = (char*)sa_realloc(msg, sizeof(char) * (++msgSize));
-    msg[msgSize - 1] = fmt[i];
+    msgSize++;
+    __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+    __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - 1] = fmt[i];
   }
 
   va_end(args);
@@ -2077,7 +2907,7 @@ static sa_uint32_t sa__getOperandSectionType(sa_uint16_t op) {
   return saSectionType_Functions;
 }
 
-static sa_uint32_t sa__getSpirvId(sa__spirvIdTable_t* pIds, const char* name) {
+static sa_uint32_t sa__getOrCreateSpirvId(sa__spirvIdTable_t* pIds, const char* name) {
   for(sa_uint32_t i = 0; i < pIds->idCount; i++) {
     if(sa__compareString(name, pIds->pIds[i].textId) == 0)
       return pIds->pIds[i].binaryId;
@@ -2092,7 +2922,7 @@ static sa_uint32_t sa__getSpirvId(sa__spirvIdTable_t* pIds, const char* name) {
   return pIds->pIds[pIds->idCount - 1].binaryId;
 }
 
-static sa_bool sa__findSpirvId(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
+static sa_bool sa__spirvIdExist(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
    for(sa_uint32_t i = 0; i < pIds->idCount; i++) {
     if(pIds->pIds[i].binaryId == id)
       return SA_TRUE;
@@ -2102,7 +2932,7 @@ static sa_bool sa__findSpirvId(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
 }
 
 static void sa__createJustId(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
-  if(sa__findSpirvId(pIds, id))
+  if(sa__spirvIdExist(pIds, id))
     return;
 
   pIds->idCount++;
@@ -2120,7 +2950,34 @@ static const char* sa__getSpirvName(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
   return SA_NULL;
 }
 
+static void sa__freeSpirvIdTable(sa__spirvIdTable_t* pIds) {
+  sa_free(pIds->pIds);
+  pIds->pIds = SA_NULL;
+  pIds->idCount = 0;
+}
+
+/**
+ * @brief Checks if such a mnemonic is valid SPIRV operand
+ * 
+ * @param mnemonic 
+ * @return sa_uint32_t index to that operand table or UINT32_MAX if non existant
+ */
+static sa_uint32_t sa__findLowLevelMnemonic(const char* mnemonic) {
+  for(sa_uint32_t i = 0; i < sizeof(SA_ASSEMBLER_LOW_LEVEL_OPCODES) / sizeof(SA_ASSEMBLER_LOW_LEVEL_OPCODES[0]); i++) {
+    if(sa__compareString(SA_ASSEMBLER_LOW_LEVEL_OPCODES[i].opcodeMnemonic, mnemonic) == 0)
+      return i;
+  }
+
+  return SA_UINT32_MAX;
+}
+
 static void sa__addInstructionFormatted(sa__assemblySection_t* pSection, sa_uint16_t wordSize, sa_uint16_t op, ...) {
+  if(!pSection) {
+    sa__errMsg("Cannot find section");
+    
+    return;
+  }
+
   pSection->instCount++;
   pSection->pInst = (sa__assemblyInstruction_t*)sa_realloc(pSection->pInst, sizeof(sa__assemblyInstruction_t) * pSection->instCount);
   pSection->pInst[pSection->instCount - 1].opCode = op;
@@ -2138,6 +2995,12 @@ static void sa__addInstructionFormatted(sa__assemblySection_t* pSection, sa_uint
 }
 
 static void sa__addInstruction(sa__assemblySection_t* pSection, sa_uint16_t wordSize, sa_uint16_t op, sa_uint32_t* words) {
+  if(!pSection) {
+    sa__errMsg("Cannot find section");
+    
+    return;
+  }
+  
   pSection->instCount++;
 
   if(pSection->pInst)
@@ -2145,6 +3008,7 @@ static void sa__addInstruction(sa__assemblySection_t* pSection, sa_uint16_t word
   else
     pSection->pInst = (sa__assemblyInstruction_t*)sa_calloc(pSection->instCount, sizeof(sa__assemblyInstruction_t));
 
+  // -1 for last instruction
   sa__setMemory(&pSection->pInst[pSection->instCount - 1], 0, sizeof(pSection->pInst[pSection->instCount - 1]));
 
   pSection->pInst[pSection->instCount - 1].opCode = op;
@@ -2154,6 +3018,12 @@ static void sa__addInstruction(sa__assemblySection_t* pSection, sa_uint16_t word
     pSection->pInst[pSection->instCount - 1].words = (sa_uint32_t*)sa_realloc(pSection->pInst[pSection->instCount - 1].words, sizeof(sa_uint32_t) * wordSize);
   else
     pSection->pInst[pSection->instCount - 1].words = (sa_uint32_t*)sa_calloc(wordSize, sizeof(sa_uint32_t));
+
+  if(!pSection->pInst[pSection->instCount - 1].words) {
+    sa__errMsg("Cannot allocate memory for pSection->pInst[pSection->instCount - 1].words");
+
+    return;
+  }
 
   sa__copyMemory(words, pSection->pInst[pSection->instCount - 1].words, (wordSize - 1) * sizeof(sa_uint32_t));
 }
@@ -2183,8 +3053,273 @@ static void sa_freeSPIRV(sa_uint8_t* spirvBin) {
   sa_free(spirvBin);
 }
 
-static void sa__makeType() {
+/**
+ * @brief Gets enum for instruction. Instruction must support that enum
+ * 
+ * @param instructionIndex index to the instruction/opcode table
+ * @param enumName enum mnemonic
+ * @return sa_uint32_t enum or SA_UINT32_t on error
+ */
+static sa_uint32_t sa__getLowLevelInstructionEnum(sa_uint32_t instructionIndex, const char* enumName) {
+  sa_uint32_t enumsCount = 0;
 
+  for(; enumsCount < saAsmEnum_COUNT; enumsCount++) {
+    if(SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].possibleEnumerant[enumsCount] == SA_UINT32_MAX)
+      break;
+  }
+
+  for(sa_uint32_t eId = 0; eId < enumsCount; eId++) {
+    sa_uint32_t tableId = SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].possibleEnumerant[eId];
+
+    printf("Checking %d\n", tableId);
+
+    for(sa_uint32_t i = 0; i < SA_MAX_ENUMERANT_ENTRIES; i++) {
+      if(!SA_ASSEMBLER_LOW_LEVEL_ENUMS[tableId][i].enumerantMnemonic)
+        break;
+
+      if(sa__compareString(SA_ASSEMBLER_LOW_LEVEL_ENUMS[tableId][i].enumerantMnemonic, enumName) == 0)
+        return SA_ASSEMBLER_LOW_LEVEL_ENUMS[tableId][i].enumerant;
+    }
+  }
+
+  return SA_UINT32_MAX;
+}
+
+#include <stdio.h>
+
+static sa_uint32_t sa__parserLowLevelSkipComment(const char * const spirvAssemblyStrStart) {
+  char* p = (char*)spirvAssemblyStrStart;
+
+  // Skip all white chars at the beginning as they are valid 
+  while(sa__isShortWhite(*p))
+    p++;
+
+  // If after skipping all the white spaces p == NL, return it as a just an empty line
+  if(*p == '\n' || *p == '\r') {
+    if(*p == '\r')
+      p++;
+
+    p++;
+
+    return p - spirvAssemblyStrStart; 
+  }
+
+  if(*p == ';') {
+    // Skip comment (full line)
+    while(*p != '\n' && *p)
+      p++;
+
+    if(*p == 0)
+      return p - spirvAssemblyStrStart;
+
+    // Skip NL char
+    p++;
+
+    // return pointer to the next line
+    return p - spirvAssemblyStrStart;
+  }
+
+  if(*p == 0)
+    return p - spirvAssemblyStrStart;
+
+  return SA_UINT32_MAX;
+}
+
+/**
+ * @brief Parses instruction to the spirv assembly struct
+ * 
+ * @param spirvAssemblyStrStart string of a spirv assembly where spirvAssemblyStrStart[0] == first letter of a operand mnemonic
+ * @param pAssembly pointer to the assemblt
+ * @param pInsideFn set to true if operand is inside function, this is required to skip most of opcodes that would be created in wrong section, like variables 
+ * @return sa_uint32_t index to the next operand or SA_UINT32_MAX on error
+ */
+static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssemblyStrStart, sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa_bool* pInsideFn, sa_uint32_t line) {
+  if(!spirvAssemblyStrStart) {
+    sa__errMsg("Cannot find start point for assembly plain");
+
+    return SA_UINT32_MAX;
+  }
+
+  if(!pAssembly) {
+    sa__errMsg("Cannot find assembly struct");
+
+    return SA_UINT32_MAX;
+  }
+
+  if(!pIds) {
+    sa__errMsg("Cannot find spirv IDs table");
+
+    return SA_UINT32_MAX;
+  }
+
+  char* p = (char*)spirvAssemblyStrStart;
+
+  sa_uint32_t skipCommentSize = sa__parserLowLevelSkipComment(p);
+
+  if(skipCommentSize != SA_UINT32_MAX)
+    return skipCommentSize;
+
+  // That should be mnemonic start
+  char* mnemonicStart = p;
+
+  // Everything in lowest level assembly is divided by spaces, 1 instruction per line
+  while(!sa__isShortWhite(*p) && *p != '\n' && *p != 0)
+    p++;
+
+  char* mnemonicEnd = p;
+  char mnemonic[256] = {0};
+
+  // Copy read mnemonic to temp mnemonic buffer
+  sa__copyMemory(mnemonicStart, mnemonic, mnemonicEnd - mnemonicStart);
+
+  // Check if mnemonic actually exist
+  sa_uint32_t instructionIndex = sa__findLowLevelMnemonic(mnemonic);
+
+  if(instructionIndex == SA_UINT32_MAX) {
+    sa__errMsg("Mnemonic \"%s\" does not exist @ line %d", mnemonic, line);
+
+    return SA_UINT32_MAX;
+  }
+
+  sa_uint16_t operand = SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].opcode;
+  sa_uint16_t minimalWordCount = SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].wordCount;
+
+  if(operand == saOp_Function)
+    *pInsideFn = SA_TRUE;
+
+  if(operand == saOp_FunctionEnd)
+    *pInsideFn = SA_FALSE;
+
+  // -1 to cut off mnemonic of opcode
+  char** allArgs = (char**)sa_calloc(minimalWordCount - 1, sizeof(char*));
+  sa_uint32_t argsCounter = 0;
+
+  if(!allArgs) {
+    sa__errMsg("Cannot allocate memory for allArgs");
+
+    return SA_UINT32_MAX;
+  }
+  
+  while(*p != '\n' && *p != 0) {
+    while(sa__isShortWhite(*p))
+      p++;
+
+    char* argStart = p;
+
+    while(!sa__isShortWhite(*p) && *p != '\n' && *p != 0)
+      p++;
+
+    char* argEnd = p;
+
+    allArgs[argsCounter] = (char*)sa_calloc(argEnd - argStart + 1, sizeof(char));
+    argsCounter++;
+
+    if(!allArgs[argsCounter - 1]) {
+      sa__errMsg("Cannot allocate memory for allArgs[argsCounter - 1]");
+
+      return SA_UINT32_MAX;
+    }
+  }
+
+  sa_uint32_t* words = (sa_uint32_t*)sa_calloc(minimalWordCount - 1, sizeof(sa_uint32_t));
+  sa_uint32_t wordsCount = 0;
+
+  if(!words) {
+    sa__errMsg("Cannot allocate memory for words");
+
+    return SA_UINT32_MAX;
+  }
+
+  for(sa_uint32_t i = 0; i < argsCounter; i++) {
+    char* arg = allArgs[i];
+    
+    // Check if function is not extendable yet exceeds word count
+    if(!SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].plusVariable && wordsCount > (minimalWordCount - 1)) {
+      sa__errMsg("%s is not extendable type, yet assembler found more than %d arguments @ line %d", mnemonic, minimalWordCount, line);
+
+      return SA_UINT32_MAX;
+    }
+
+    if(arg[0] == '%') {
+      sa_uint32_t id = sa__getOrCreateSpirvId(pIds, &arg[1]);
+      words[wordsCount] = SA_CONVERT(id);
+      wordsCount++;
+    }
+    else if(sa__isStringInteger(arg)) {
+      sa_uint32_t value = sa__stringToInt(arg);
+      words[wordsCount] = SA_CONVERT(value);
+      wordsCount++;
+    }
+    else if(sa__isStringFloat(arg)) {
+      float value = sa__stringToFloat(arg);
+      words[wordsCount] = SA_CONVERT(*sa_ptr32(&value));
+      wordsCount++;
+    }
+    else if(arg[0] == '\"' && arg[sa__lengthString(arg) - 1] == '\"') {
+      char* buffer = (char*)sa_calloc(sa__lengthString(arg) - 1, sizeof(arg[0]));
+      if(!buffer) {
+        sa__errMsg("Cannot allocate memory for buffer");
+
+        return SA_UINT32_MAX;
+      }
+      sa__copyMemory(&arg[1], buffer, sa__lengthString(arg) - 2);
+
+      for(sa_uint32_t j = 0; j < (sa__lengthString(buffer) + sizeof(sa_uint32_t) - 1) / sizeof(sa_uint32_t); j++) {
+        // XXX: Can be that conversion to LE be deleted?
+        words[wordsCount] = SA_CONVERT(SA_LITTLE_ENDIAN32(*sa_ptr32(&buffer[j * 4])));
+        wordsCount++;
+
+        if(wordsCount >= (minimalWordCount - 1))
+          words = (sa_uint32_t*)sa_realloc(words, wordsCount * sizeof(sa_uint32_t));
+
+        if(!words) {
+          sa__errMsg("Cannot reallocate memory for words");
+
+          return SA_UINT32_MAX;
+        }
+      }
+
+      sa_free(buffer);
+      buffer = SA_NULL;
+    }
+    else {
+      sa_uint32_t enumerant = sa__getLowLevelInstructionEnum(instructionIndex, arg);
+
+      words[wordsCount] = SA_CONVERT(enumerant);
+      wordsCount++;
+
+      if(enumerant == SA_UINT32_MAX) {
+        sa__errMsg("Wrong enumerant for %s: %s @ line %d", sa__opcodeToString(operand), arg, line);
+
+        return SA_UINT32_MAX;
+      }
+    }
+
+    if(wordsCount >= (minimalWordCount - 1))
+      words = (sa_uint32_t*)sa_realloc(words, wordsCount * sizeof(sa_uint32_t));
+
+    if(!words) {
+      sa__errMsg("Cannot reallocate memory for words");
+
+      return SA_UINT32_MAX;
+    }
+  }
+
+  // Add instruction
+  sa__addInstruction(&pAssembly->section[*pInsideFn ? saSectionType_Functions : sa__getOperandSectionType(operand)], wordsCount + 1, operand, words);
+
+  sa_free(words);
+  words = SA_NULL;
+
+  for(sa_uint32_t i = 0; i < argsCounter; i++) {
+    sa_free(allArgs[i]);
+    allArgs[i] = SA_NULL;
+  }
+  
+  sa_free(allArgs);
+  allArgs = SA_NULL;
+
+  return p - spirvAssemblyStrStart;
 }
 
 /**
@@ -2196,6 +3331,63 @@ static void sa__makeType() {
  */
 static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAssembly) {
   sa__resetId();
+
+  sa_uint32_t index = 0;
+
+  sa__spirvIdTable_t ids = {0};
+  sa_bool insideFn = SA_FALSE;
+  sa_uint32_t line = 1;
+
+  while(spirvBasicAssembly[index]) {
+    sa_uint32_t next = sa__parseLowLevelInstruction(&spirvBasicAssembly[index], pAssembly, &ids, &insideFn, line);
+
+    printf("There is next: %u\n", next);
+
+    if(next == SA_UINT32_MAX) {
+      while(spirvBasicAssembly[index] != '\n')
+        index++;
+      
+      index++;
+
+      sa__errMsg("Something went wrong @ line %d", line);
+
+      return;
+    }
+
+    if(next != SA_UINT32_MAX) {
+      index += next;
+    }
+
+    line++;
+  }
+
+  for(sa_uint32_t i = 0; i < ids.idCount; i++) {
+    if(ids.pIds[i].textId[0] != '%') {
+      // +3 to add 1 more uint if there is not equal amount of bytes
+      const sa_uint32_t wordSize = ((sa__lengthString(ids.pIds[i].textId) + 3) / sizeof(sa_uint32_t)) + 1;
+      // Allocate for string and 1 uint32 value for id
+      sa_uint32_t* words = (sa_uint32_t*)sa_calloc(wordSize, sizeof(sa_uint32_t));
+
+      words[0] = ids.pIds[i].binaryId;
+
+      // -1 for already added binaryId
+      for(sa_uint32_t j = 0; j < wordSize - 1; i++) {
+        words[j + 1] = 
+          (((sa_uint32_t)ids.pIds[i].textId[j * 4 + 0]) << 24) | 
+          (((sa_uint32_t)ids.pIds[i].textId[j * 4 + 1]) << 16) | 
+          (((sa_uint32_t)ids.pIds[i].textId[j * 4 + 2]) << 8) |
+          ((sa_uint32_t)ids.pIds[i].textId[j * 4 + 3]);
+      }
+
+      // Word size needs to account operand, so +1
+      sa__addInstruction(&pAssembly->section[sa__getOperandSectionType(saOp_Name)], wordSize + 1, saOp_Name, words);
+
+      sa_free(words);
+      words = SA_NULL;
+    }
+  }
+
+  sa__freeSpirvIdTable(&ids);
 }
 
 /**
@@ -2206,15 +3398,45 @@ static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAss
  * @return sa_binary pointer to binary data itself
  */
 static sa_uint8_t* sa_bakeSPIRV(const sa_assembly_t* const pAssembly, sa_uint32_t* pBinarySizeOut) {
+  if(!pAssembly) {
+    sa__errMsg("No assembly");
+
+    return SA_NULL;
+  }
+
+  if(!pBinarySizeOut) {
+    sa__errMsg("No size output");
+
+    return SA_NULL;
+  }
+
   sa_uint8_t* sbin = (sa_uint8_t*)sa_malloc(sizeof(sa__assemblyHeader_t));
   sa_uint32_t sbinSize = (sizeof(sa__assemblyHeader_t) / sizeof(sa_uint32_t));
 
   // Always converted to little endian
-  sa_ptr32(sbin)[0] = SA_LITTLE_ENDIAN32(SA_SPIRV_MAGIC_NUMBER);
-  sa_ptr32(sbin)[1] = SA_LITTLE_ENDIAN32(SA_SPIRV_VERSION);
-  sa_ptr32(sbin)[2] = SA_LITTLE_ENDIAN32(SA_SPIRV_GENERATOR_ID);
-  sa_ptr32(sbin)[3] = SA_LITTLE_ENDIAN32(pAssembly->header.bounds);
-  sa_ptr32(sbin)[4] = SA_LITTLE_ENDIAN32(pAssembly->header.schema);
+  sa_ptr32(sbin)[0] = SA_CONVERT(SA_SPIRV_MAGIC_NUMBER);
+  sa_ptr32(sbin)[1] = SA_CONVERT(SA_SPIRV_VERSION);
+  sa_ptr32(sbin)[2] = SA_CONVERT(SA_SPIRV_GENERATOR_ID);
+  sa_ptr32(sbin)[3] = SA_CONVERT(pAssembly->header.bounds);
+  sa_ptr32(sbin)[4] = SA_CONVERT(pAssembly->header.schema);
+
+  for(sa_uint32_t sectId = 0; sectId < saSectionType_COUNT; sectId++) {
+    const sa__assemblySection_t* const pSect = &pAssembly->section[sectId];
+
+    for(sa_uint32_t instId = 0; instId < pSect->instCount; instId++) {
+      const sa_uint32_t instStart = sbinSize;
+      sa__assemblyInstruction_t* pInst = &pSect->pInst[instId];
+
+      sbinSize += pInst->wordSize;
+      sbin = (sa_uint8_t*)sa_realloc(sbin, sbinSize * sizeof(sa_uint32_t));
+
+      sa_ptr32(sbin)[instStart + 0] = SA_CONVERT((((sa_uint32_t)pInst->wordSize) << 16) | pInst->opCode);
+
+      for(sa_uint32_t argId = 1; argId < pInst->wordSize; argId++) {
+        sa_ptr32(sbin)[instStart + argId] = SA_CONVERT(pInst->words[argId]);
+      }
+    }
+  }
 
   return sbin;
 }

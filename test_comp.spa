@@ -1,4 +1,4 @@
-ExtInstImport %%glsl GLSL.std.450
+ExtInstImport %%glsl "GLSL.std.450"
 
 EntryPoint Compute %main main
 
@@ -32,9 +32,9 @@ TypeVector %v3fT %f32T 3
 TypePointer %v3f Function %v3fT
 
 TypeStruct %lightInfoST %v3fT %v3fT %f32T
-MemberName %lightInfoST 0 color
-MemberName %lightInfoST 1 direction
-MemberName %lightInfoST 2 intensity
+MemberName %lightInfoST 0 "color"
+MemberName %lightInfoST 1 "direction"
+MemberName %lightInfoST 2 "intensity"
 TypePointer %lightInfoS Function %lightInfoST
 
 TypeFunction %fn_compLightT %v3fT %v3f %lightInfoS
@@ -43,8 +43,8 @@ Function %computeLight None %fn_compLightT
 FunctionParameter %position %v3f
 FunctionParameter %lightInfo %lightInfoS
 
-; Empty or double does not create name
-Label %
+; Double does not create name
+Label %%label1
 
 Variable %direction %v3f Function
 
