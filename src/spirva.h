@@ -46,6 +46,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+// TODO: Delete this; for debugging
+#include <stdio.h>
+
 #define sa_malloc malloc
 #define sa_calloc calloc
 #define sa_realloc realloc
@@ -1254,7 +1257,7 @@ typedef struct sa__lexer_s {
 } sa__lexer_t;*/
 
 typedef struct sa__spirvId_s {
-  char textId[256];
+  char textId[512];
   sa_uint32_t binaryId;
 } sa__spirvId_t;
 
@@ -1306,7 +1309,7 @@ struct sa__assemblerLowLevelEnumerantConnection_s {
   sa_uint32_t enumerant;
 };
 
-static sa_uint32_t __gIdGeneratorHoldValue = 0;
+static sa_uint32_t __gIdGeneratorHoldValue = 1;
 static struct sa__assemblerErrorMessages_s __gAssemblerErrorMessages = {0};
 
 const struct sa__assemblerLowLevelOpCodeConnection_s SA_ASSEMBLER_LOW_LEVEL_OPCODES[] = {
@@ -2728,7 +2731,6 @@ static char* sa__floatToString(float value, int decimals) {
   return buf;
 }
 
-#include <stdio.h>
 static void sa__errMsg(const char* fmt, ...) {
   printf("%\n", fmt);
 
@@ -2832,7 +2834,7 @@ static sa_uint32_t sa__genId() {
 }
 
 static void sa__resetId() {
-  __gIdGeneratorHoldValue = 0;
+  __gIdGeneratorHoldValue = 1;
 }
 
 static sa_uint32_t sa__getOperandSectionType(sa_uint16_t op) {
@@ -2917,9 +2919,19 @@ static sa_uint32_t sa__getOrCreateSpirvId(sa__spirvIdTable_t* pIds, const char* 
   pIds->pIds = (sa__spirvId_t*)sa_realloc(pIds->pIds, sizeof(sa__spirvId_t) * pIds->idCount);
   sa__setMemory(&pIds->pIds[pIds->idCount - 1], 0, sizeof(pIds->pIds[pIds->idCount - 1]));
   pIds->pIds[pIds->idCount - 1].binaryId = sa__genId();
+  sa__setMemory(pIds->pIds[pIds->idCount - 1].textId, 0, sizeof(pIds->pIds[pIds->idCount - 1].textId));
   sa__copyMemory(name, pIds->pIds[pIds->idCount - 1].textId, sa__lengthString(name));
 
   return pIds->pIds[pIds->idCount - 1].binaryId;
+}
+
+static void sa__createSpirvNameId(sa__spirvIdTable_t* pIds, const char* name, sa_uint32_t id) {
+  pIds->idCount++;
+  pIds->pIds = (sa__spirvId_t*)sa_realloc(pIds->pIds, sizeof(sa__spirvId_t) * pIds->idCount);
+  sa__setMemory(&pIds->pIds[pIds->idCount - 1], 0, sizeof(pIds->pIds[pIds->idCount - 1]));
+  pIds->pIds[pIds->idCount - 1].binaryId = id;
+  sa__setMemory(pIds->pIds[pIds->idCount - 1].textId, 0, sizeof(pIds->pIds[pIds->idCount - 1].textId));
+  sa__copyMemory(name, pIds->pIds[pIds->idCount - 1].textId, sa__lengthString(name));
 }
 
 static sa_bool sa__spirvIdExist(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
@@ -2971,36 +2983,21 @@ static sa_uint32_t sa__findLowLevelMnemonic(const char* mnemonic) {
   return SA_UINT32_MAX;
 }
 
-static void sa__addInstructionFormatted(sa__assemblySection_t* pSection, sa_uint16_t wordSize, sa_uint16_t op, ...) {
-  if(!pSection) {
-    sa__errMsg("Cannot find section");
-    
-    return;
-  }
-
-  pSection->instCount++;
-  pSection->pInst = (sa__assemblyInstruction_t*)sa_realloc(pSection->pInst, sizeof(sa__assemblyInstruction_t) * pSection->instCount);
-  pSection->pInst[pSection->instCount - 1].opCode = op;
-  pSection->pInst[pSection->instCount - 1].wordSize = wordSize;
-  pSection->pInst[pSection->instCount - 1].words = (sa_uint32_t*)sa_realloc(pSection->pInst[pSection->instCount - 1].words, sizeof(sa_uint32_t) * wordSize);
-
-  va_list args;
-  va_start(args, wordSize - 1);
-
-  for(sa_uint32_t i = 0; i < wordSize - 1; i++) {
-    pSection->pInst[pSection->instCount - 1].words[i] = va_arg(args, sa_uint32_t);
-  }
-
-  va_end(args);
-}
-
+/**
+ * @brief 
+ * 
+ * @param pSection 
+ * @param wordSize Includes opcode 
+ * @param op opcode
+ * @param words all the parameters
+ */
 static void sa__addInstruction(sa__assemblySection_t* pSection, sa_uint16_t wordSize, sa_uint16_t op, sa_uint32_t* words) {
   if(!pSection) {
     sa__errMsg("Cannot find section");
     
     return;
   }
-  
+
   pSection->instCount++;
 
   if(pSection->pInst)
@@ -3013,11 +3010,9 @@ static void sa__addInstruction(sa__assemblySection_t* pSection, sa_uint16_t word
 
   pSection->pInst[pSection->instCount - 1].opCode = op;
   pSection->pInst[pSection->instCount - 1].wordSize = wordSize;
+  pSection->pInst[pSection->instCount - 1].words = (sa_uint32_t*)sa_calloc((wordSize - 1), sizeof(sa_uint32_t));
 
-  if(pSection->pInst[pSection->instCount - 1].words)
-    pSection->pInst[pSection->instCount - 1].words = (sa_uint32_t*)sa_realloc(pSection->pInst[pSection->instCount - 1].words, sizeof(sa_uint32_t) * wordSize);
-  else
-    pSection->pInst[pSection->instCount - 1].words = (sa_uint32_t*)sa_calloc(wordSize, sizeof(sa_uint32_t));
+  //sa__setMemory(pSection->pInst[pSection->instCount - 1].words, 0, sizeof(sa_uint32_t) * (wordSize - 1));
 
   if(!pSection->pInst[pSection->instCount - 1].words) {
     sa__errMsg("Cannot allocate memory for pSection->pInst[pSection->instCount - 1].words");
@@ -3071,8 +3066,6 @@ static sa_uint32_t sa__getLowLevelInstructionEnum(sa_uint32_t instructionIndex, 
   for(sa_uint32_t eId = 0; eId < enumsCount; eId++) {
     sa_uint32_t tableId = SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].possibleEnumerant[eId];
 
-    printf("Checking %d\n", tableId);
-
     for(sa_uint32_t i = 0; i < SA_MAX_ENUMERANT_ENTRIES; i++) {
       if(!SA_ASSEMBLER_LOW_LEVEL_ENUMS[tableId][i].enumerantMnemonic)
         break;
@@ -3085,8 +3078,6 @@ static sa_uint32_t sa__getLowLevelInstructionEnum(sa_uint32_t instructionIndex, 
   return SA_UINT32_MAX;
 }
 
-#include <stdio.h>
-
 static sa_uint32_t sa__parserLowLevelSkipComment(const char * const spirvAssemblyStrStart) {
   char* p = (char*)spirvAssemblyStrStart;
 
@@ -3095,9 +3086,9 @@ static sa_uint32_t sa__parserLowLevelSkipComment(const char * const spirvAssembl
     p++;
 
   // If after skipping all the white spaces p == NL, return it as a just an empty line
-  if(*p == '\n' || *p == '\r') {
-    if(*p == '\r')
-      p++;
+  if(*p == '\n' /*|| *p == '\r'*/) {
+    //if(*p == '\r')
+    //  p++;
 
     p++;
 
@@ -3190,7 +3181,7 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
   if(operand == saOp_FunctionEnd)
     *pInsideFn = SA_FALSE;
 
-  // -1 to cut off mnemonic of opcode
+  // -1 to cut off mnemonic from opcode
   char** allArgs = (char**)sa_calloc(minimalWordCount - 1, sizeof(char*));
   sa_uint32_t argsCounter = 0;
 
@@ -3211,8 +3202,14 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
 
     char* argEnd = p;
 
-    allArgs[argsCounter] = (char*)sa_calloc(argEnd - argStart + 1, sizeof(char));
     argsCounter++;
+
+    if(argsCounter > (minimalWordCount - 1))
+      allArgs = (char**)sa_realloc(allArgs, argsCounter * sizeof(char*));
+
+    allArgs[argsCounter - 1] = (char*)sa_calloc(argEnd - argStart + 1, sizeof(char));
+
+    sa__copyMemory(argStart, allArgs[argsCounter - 1], argEnd - argStart);
 
     if(!allArgs[argsCounter - 1]) {
       sa__errMsg("Cannot allocate memory for allArgs[argsCounter - 1]");
@@ -3222,7 +3219,7 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
   }
 
   sa_uint32_t* words = (sa_uint32_t*)sa_calloc(minimalWordCount - 1, sizeof(sa_uint32_t));
-  sa_uint32_t wordsCount = 0;
+  sa_uint32_t wordsSize = 0;
 
   if(!words) {
     sa__errMsg("Cannot allocate memory for words");
@@ -3234,26 +3231,36 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
     char* arg = allArgs[i];
     
     // Check if function is not extendable yet exceeds word count
-    if(!SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].plusVariable && wordsCount > (minimalWordCount - 1)) {
+    if(!SA_ASSEMBLER_LOW_LEVEL_OPCODES[instructionIndex].plusVariable && wordsSize > (minimalWordCount - 1)) {
       sa__errMsg("%s is not extendable type, yet assembler found more than %d arguments @ line %d", mnemonic, minimalWordCount, line);
 
       return SA_UINT32_MAX;
     }
 
+    wordsSize++;
+
+    if(wordsSize > (minimalWordCount - 1)) {
+      words = (sa_uint32_t*)sa_realloc(words, wordsSize * sizeof(sa_uint32_t));
+      words[wordsSize - 1] = 0;
+    }
+
+    if(!words) {
+      sa__errMsg("Cannot reallocate memory for words");
+
+      return SA_UINT32_MAX;
+    }
+
     if(arg[0] == '%') {
-      sa_uint32_t id = sa__getOrCreateSpirvId(pIds, &arg[1]);
-      words[wordsCount] = SA_CONVERT(id);
-      wordsCount++;
+      sa_uint32_t id = sa__getOrCreateSpirvId(pIds, arg + 1);
+      words[wordsSize - 1] = SA_CONVERT(id);
     }
     else if(sa__isStringInteger(arg)) {
       sa_uint32_t value = sa__stringToInt(arg);
-      words[wordsCount] = SA_CONVERT(value);
-      wordsCount++;
+      words[wordsSize - 1] = SA_CONVERT(value);
     }
     else if(sa__isStringFloat(arg)) {
       float value = sa__stringToFloat(arg);
-      words[wordsCount] = SA_CONVERT(*sa_ptr32(&value));
-      wordsCount++;
+      words[wordsSize - 1] = SA_CONVERT(*sa_ptr32(&value));
     }
     else if(arg[0] == '\"' && arg[sa__lengthString(arg) - 1] == '\"') {
       char* buffer = (char*)sa_calloc(sa__lengthString(arg) - 1, sizeof(arg[0]));
@@ -3264,20 +3271,33 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
       }
       sa__copyMemory(&arg[1], buffer, sa__lengthString(arg) - 2);
 
-      for(sa_uint32_t j = 0; j < (sa__lengthString(buffer) + sizeof(sa_uint32_t) - 1) / sizeof(sa_uint32_t); j++) {
-        // XXX: Can be that conversion to LE be deleted?
-        words[wordsCount] = SA_CONVERT(SA_LITTLE_ENDIAN32(*sa_ptr32(&buffer[j * 4])));
-        wordsCount++;
-
-        if(wordsCount >= (minimalWordCount - 1))
-          words = (sa_uint32_t*)sa_realloc(words, wordsCount * sizeof(sa_uint32_t));
-
+      for(sa_uint32_t j = 0; j < ((sa__lengthString(buffer) + 1) + 3) / sizeof(sa_uint32_t); j++) {
+        if(wordsSize > (minimalWordCount - 1)) {
+          words = (sa_uint32_t*)sa_realloc(words, wordsSize * sizeof(sa_uint32_t));
+          words[wordsSize - 1] = 0;
+        }
+        
         if(!words) {
           sa__errMsg("Cannot reallocate memory for words");
-
+          
           return SA_UINT32_MAX;
         }
+
+        sa_uint32_t tmpWord = 0;
+
+        for(sa_uint32_t k = 0; k < 4; k++) {
+          if((j * 4 + k) <= sa__lengthString(buffer))
+            tmpWord |= ((sa_uint32_t)buffer[j * 4 + k]) << (8 * k);
+          else
+            break;
+        }
+
+        words[wordsSize - 1] = SA_CONVERT(tmpWord);
+
+        wordsSize++;
       }
+
+      wordsSize--;
 
       sa_free(buffer);
       buffer = SA_NULL;
@@ -3285,8 +3305,7 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
     else {
       sa_uint32_t enumerant = sa__getLowLevelInstructionEnum(instructionIndex, arg);
 
-      words[wordsCount] = SA_CONVERT(enumerant);
-      wordsCount++;
+      words[wordsSize - 1] = SA_CONVERT(enumerant);
 
       if(enumerant == SA_UINT32_MAX) {
         sa__errMsg("Wrong enumerant for %s: %s @ line %d", sa__opcodeToString(operand), arg, line);
@@ -3294,19 +3313,10 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
         return SA_UINT32_MAX;
       }
     }
-
-    if(wordsCount >= (minimalWordCount - 1))
-      words = (sa_uint32_t*)sa_realloc(words, wordsCount * sizeof(sa_uint32_t));
-
-    if(!words) {
-      sa__errMsg("Cannot reallocate memory for words");
-
-      return SA_UINT32_MAX;
-    }
   }
-
+  
   // Add instruction
-  sa__addInstruction(&pAssembly->section[*pInsideFn ? saSectionType_Functions : sa__getOperandSectionType(operand)], wordsCount + 1, operand, words);
+  sa__addInstruction(&pAssembly->section[(*pInsideFn) == SA_TRUE ? saSectionType_Functions : sa__getOperandSectionType(operand)], wordsSize + 1, operand, words);
 
   sa_free(words);
   words = SA_NULL;
@@ -3338,13 +3348,24 @@ static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAss
   sa_bool insideFn = SA_FALSE;
   sa_uint32_t line = 1;
 
-  while(spirvBasicAssembly[index]) {
-    sa_uint32_t next = sa__parseLowLevelInstruction(&spirvBasicAssembly[index], pAssembly, &ids, &insideFn, line);
+  const sa_uint32_t spirvSize = sa__lengthString(spirvBasicAssembly);
+  char* strippedSpirv = (char*)sa_calloc(spirvSize, sizeof(char));
+  sa_uint32_t strippedSpirvSize = 0;
 
-    printf("There is next: %u\n", next);
+  for(sa_uint32_t i = 0; i < spirvSize; i++) {
+    if(spirvBasicAssembly[i] != '\r') { 
+      strippedSpirv[strippedSpirvSize] = spirvBasicAssembly[i];
+      strippedSpirvSize++;
+    }
+  }
+
+  strippedSpirv = (char*)sa_realloc(strippedSpirv, (strippedSpirvSize + 1) * sizeof(char));
+
+  while(strippedSpirv[index]) {
+    sa_uint32_t next = sa__parseLowLevelInstruction(&strippedSpirv[index], pAssembly, &ids, &insideFn, line);
 
     if(next == SA_UINT32_MAX) {
-      while(spirvBasicAssembly[index] != '\n')
+      while(strippedSpirv[index] != '\n')
         index++;
       
       index++;
@@ -3361,31 +3382,38 @@ static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAss
     line++;
   }
 
+  pAssembly->header.bounds = ids.idCount;
+
   for(sa_uint32_t i = 0; i < ids.idCount; i++) {
     if(ids.pIds[i].textId[0] != '%') {
       // +3 to add 1 more uint if there is not equal amount of bytes
-      const sa_uint32_t wordSize = ((sa__lengthString(ids.pIds[i].textId) + 3) / sizeof(sa_uint32_t)) + 1;
+      const sa_uint32_t wordSize = (((sa__lengthString(ids.pIds[i].textId) + 1) + 3) / sizeof(sa_uint32_t)) + 1;
       // Allocate for string and 1 uint32 value for id
-      sa_uint32_t* words = (sa_uint32_t*)sa_calloc(wordSize, sizeof(sa_uint32_t));
+      sa_uint32_t* words = (sa_uint32_t*)sa_malloc(wordSize * sizeof(sa_uint32_t));
+      sa__setMemory(words, 0, wordSize / sizeof(sa_uint32_t));
 
       words[0] = ids.pIds[i].binaryId;
 
       // -1 for already added binaryId
-      for(sa_uint32_t j = 0; j < wordSize - 1; i++) {
-        words[j + 1] = 
-          (((sa_uint32_t)ids.pIds[i].textId[j * 4 + 0]) << 24) | 
-          (((sa_uint32_t)ids.pIds[i].textId[j * 4 + 1]) << 16) | 
-          (((sa_uint32_t)ids.pIds[i].textId[j * 4 + 2]) << 8) |
-          ((sa_uint32_t)ids.pIds[i].textId[j * 4 + 3]);
+      for(sa_uint32_t j = 1; j < wordSize; j++) {
+        words[j] =
+          ((((sa_uint32_t)ids.pIds[i].textId[(j - 1) * 4 + 3]) << 24) & 0xFF000000) | 
+          ((((sa_uint32_t)ids.pIds[i].textId[(j - 1) * 4 + 2]) << 16) & 0x00FF0000) | 
+          ((((sa_uint32_t)ids.pIds[i].textId[(j - 1) * 4 + 1]) << 8) & 0x0000FF00) |
+          ((((sa_uint32_t)ids.pIds[i].textId[(j - 1) * 4 + 0]) << 0) & 0x000000FF);
       }
 
       // Word size needs to account operand, so +1
-      sa__addInstruction(&pAssembly->section[sa__getOperandSectionType(saOp_Name)], wordSize + 1, saOp_Name, words);
+      sa__addInstruction(&pAssembly->section[sa__getOperandSectionType(saOp_Name)], wordSize + 1, saOp_Name, &words[0]);
 
       sa_free(words);
       words = SA_NULL;
     }
   }
+
+  sa_free(strippedSpirv);
+  strippedSpirv = SA_NULL;
+  strippedSpirvSize = 0;
 
   sa__freeSpirvIdTable(&ids);
 }
@@ -3425,18 +3453,18 @@ static sa_uint8_t* sa_bakeSPIRV(const sa_assembly_t* const pAssembly, sa_uint32_
 
     for(sa_uint32_t instId = 0; instId < pSect->instCount; instId++) {
       const sa_uint32_t instStart = sbinSize;
-      sa__assemblyInstruction_t* pInst = &pSect->pInst[instId];
+      const sa__assemblyInstruction_t* const pInst = &pSect->pInst[instId];
 
       sbinSize += pInst->wordSize;
       sbin = (sa_uint8_t*)sa_realloc(sbin, sbinSize * sizeof(sa_uint32_t));
 
       sa_ptr32(sbin)[instStart + 0] = SA_CONVERT((((sa_uint32_t)pInst->wordSize) << 16) | pInst->opCode);
 
-      for(sa_uint32_t argId = 1; argId < pInst->wordSize; argId++) {
-        sa_ptr32(sbin)[instStart + argId] = SA_CONVERT(pInst->words[argId]);
-      }
+      sa__copyMemory(pInst->words, &sa_ptr32(sbin)[instStart + 1], (pInst->wordSize - 1) * sizeof(sa_uint32_t));
     }
   }
+
+  *pBinarySizeOut = sbinSize * sizeof(sa_uint32_t);
 
   return sbin;
 }

@@ -1,6 +1,6 @@
 ExtInstImport %%glsl "GLSL.std.450"
 
-EntryPoint Compute %main main
+EntryPoint GLCompute %main "main"
 
 ExecutionMode %main LocalSize 1 1 1
 
@@ -13,7 +13,7 @@ TypePointer %v3u Input %v3uT
 ; var decl
 Variable %GlobalInvocationId %v3i Input
 ; var as built-in
-Decorate %GlobalInvocationId Builtin GlobalInvocationId
+Decorate %GlobalInvocationId BuiltIn GlobalInvocationId
 
 ; Void def
 TypeVoid %voidT
@@ -32,9 +32,9 @@ TypeVector %v3fT %f32T 3
 TypePointer %v3f Function %v3fT
 
 TypeStruct %lightInfoST %v3fT %v3fT %f32T
-MemberName %lightInfoST 0 "color"
-MemberName %lightInfoST 1 "direction"
-MemberName %lightInfoST 2 "intensity"
+; MemberName %lightInfoST 0 "color"
+; MemberName %lightInfoST 1 "direction"
+; MemberName %lightInfoST 2 "intensity"
 TypePointer %lightInfoS Function %lightInfoST
 
 TypeFunction %fn_compLightT %v3fT %v3f %lightInfoS
@@ -58,7 +58,7 @@ Load %v3fT %%position %position
 
 FSub %v3fT %%fsub %%directionS %%position
 
-ExtInst %v3fT %%normalizeResult %%glsl Normalize %%fsub
+ExtInst %v3fT %%normalizeResult %glsl "Normalize" %%fsub
 
 Store %direction %%normalizeResult
 Load %v3fT %%direction2 %direction
