@@ -1,4 +1,4 @@
-ExtInstImport %%glsl "GLSL.std.450"
+ExtInstImport %glsl "GLSL.std.450"
 
 EntryPoint GLCompute %main "main"
 
@@ -20,11 +20,6 @@ TypeVoid %voidT
 ; Fn def with ret void
 TypeFunction %fn_voidT %voidT 
 
-; fn decl
-Function %main None %fn_voidT
-
-FunctionEnd
-
 ; Float 32 def
 TypeFloat %f32T 32
 ; Vector3 def
@@ -39,41 +34,46 @@ TypePointer %lightInfoS Function %lightInfoST
 
 TypeFunction %fn_compLightT %v3fT %v3f %lightInfoS
 
-Function %computeLight None %fn_compLightT
+TypeInt %i32T 32 1
+Constant %i32T %%0 0
+Constant %i32T %%1 1
+Constant %i32T %%2 2
+TypePointer %f32 Function %f32T
+
+; fn decl
+Function %voidT %main None %fn_voidT
+
+FunctionEnd
+
+Function %v3fT %computeLight None %fn_compLightT
 FunctionParameter %position %v3f
 FunctionParameter %lightInfo %lightInfoS
 
 ; Double does not create name
-Label %%label1
+  Label %%label1
 
-Variable %direction %v3f Function
+  Variable %v3f %direction Function
 
-TypeInt %i32T 32 1
-Constant %%1 %i32T 1
+  AccessChain %v3f %%accessDirection %lightInfo %%1
 
-AccessChain %v3f %%accessDirection %lightInfo %%1
+  Load %v3fT %%directionS %%accessDirection
+  Load %v3fT %%position %position
 
-Load %v3fT %%directionS %%accessDirection
-Load %v3fT %%position %position
+  FSub %v3fT %%fsub %%directionS %%position
 
-FSub %v3fT %%fsub %%directionS %%position
+  ExtInst %v3fT %%normalizeResult %glsl Normalize %%fsub
 
-ExtInst %v3fT %%normalizeResult %glsl "Normalize" %%fsub
+  Store %direction %%normalizeResult
+  Load %v3fT %%direction2 %direction
 
-Store %direction %%normalizeResult
-Load %v3fT %%direction2 %direction
+  AccessChain %f32 %%accessIntensity %lightInfo %%2
+  Load %f32T %%intensity %%accessIntensity
+  VectorTimesScalar %v3fT %%dirIntensity %%direction2 %%intensity
 
-TypePointer %f32 Function %f32T
-Constant %%2 %i32T 2
-AccessChain %f32 %%accessIntensity %lightInfo %%2
-Load %f32T %%intensity %%accessIntensity
-VectorTimesScalar %v3fT %%dirIntensity %%direction2 %%intensity
+  AccessChain %v3f %%accessColor %lightInfo %%0
+  Load %v3fT %%color %%accessColor
+  FMul %v3fT %%mulColor %%dirIntensity %%color
 
-Constant %%0 %i32T 0
-AccessChain %v3f %%accessColor %lightInfo %%0
-Load %v3fT %%color %%accessColor
-FMul %v3fT %%mulColor %%dirIntensity %%color
-
-ReturnValue %%mulColor
+  ReturnValue %%mulColor
 
 FunctionEnd

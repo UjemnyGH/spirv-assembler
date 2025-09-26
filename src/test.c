@@ -86,35 +86,23 @@ int main() {
   sa_assembleSPIRV(spirvBin, &sasm);
 
   for(sa_uint32_t i = 0; i < __gAssemblerErrorMessages.messagesAmount; i++) {
-    printf("%s\n", __gAssemblerErrorMessages.pMessages[i]);
+    printf("[ERROR]: %s\n", __gAssemblerErrorMessages.pMessages[i]);
   }
 
   sa_uint32_t binarySize = 0;
   sa_uint8_t* binary = sa_bakeSPIRV(&sasm, &binarySize);
 
-  /*printf("Binary size: %d\n", binarySize);
+  printf("Binary size: %d\n", binarySize);
 
   saveBin("test_comp_spv.spv", binary, binarySize);
 
   printf("Binary saved\n");
 
-  sa_free(binary);*/
+  sa_free(binary);
 
   //printAssembly(&sasm);
   sa_freeAssembly(&sasm);
   free(spirvBin);
-
-  sa_assembly_t dis;
-  sa_disassembleSPIRV(&dis, binary, binarySize / sizeof(sa_uint32_t));
-
-  for(sa_uint32_t i = 0; i < __gAssemblerErrorMessages.messagesAmount; i++) {
-    printf("%s", __gAssemblerErrorMessages.pMessages[i]);
-  }
-
-  printAssembly(&dis);
-
-  sa_free(binary);
-  sa_freeAssembly(&dis);
 
   /*sa_assembly_t spvasm;
   sa_disassembleSPIRV(&spvasm, spirvBin, length / sizeof(sa_uint32_t));

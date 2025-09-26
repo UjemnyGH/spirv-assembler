@@ -46,8 +46,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-// TODO: Delete this; for debugging
-#include <stdio.h>
+// XXX: Delete this; for debugging
+//#include <stdio.h>
 
 #define sa_malloc malloc
 #define sa_calloc calloc
@@ -680,6 +680,89 @@ enum sa__Capability_e {
   // TODO: Add all of capabilities
 };
 
+enum sa__GLSLExtension_e {
+  saGLSLExt_Round = 1,
+  saGLSLExt_RoundEven = 2,
+  saGLSLExt_Trunc = 3,
+  saGLSLExt_FAbs = 4,
+  saGLSLExt_SAbs = 5,
+  saGLSLExt_FSign = 6,
+  saGLSLExt_SSign = 7,
+  saGLSLExt_Floor = 8,
+  saGLSLExt_Ceil = 9,
+  saGLSLExt_Fract = 10,
+  saGLSLExt_Radians = 11,
+  saGLSLExt_Degrees = 12,
+  saGLSLExt_Sin = 13,
+  saGLSLExt_Cos = 14,
+  saGLSLExt_Tan = 15,
+  saGLSLExt_Asin = 16,
+  saGLSLExt_Acos = 17,
+  saGLSLExt_Atan = 18,
+  saGLSLExt_Sinh = 19,
+  saGLSLExt_Cosh = 20,
+  saGLSLExt_Tanh = 21,
+  saGLSLExt_Asinh = 22,
+  saGLSLExt_Acosh = 23,
+  saGLSLExt_Atanh = 24,
+  saGLSLExt_Atan2 = 25,
+  saGLSLExt_Pow = 26,
+  saGLSLExt_Exp = 27,
+  saGLSLExt_Log = 28,
+  saGLSLExt_Exp2 = 29,
+  saGLSLExt_Log2 = 30,
+  saGLSLExt_Sqrt = 31,
+  saGLSLExt_InverseSqrt = 32,
+  saGLSLExt_Determinant = 33,
+  saGLSLExt_MatrixInverse = 34,
+  saGLSLExt_Modf = 35,
+  saGLSLExt_ModfStruct = 36,
+  saGLSLExt_FMin = 37,
+  saGLSLExt_UMin = 38,
+  saGLSLExt_SMin = 39,
+  saGLSLExt_FMax = 40,
+  saGLSLExt_UMax = 41,
+  saGLSLExt_SMax = 42,
+  saGLSLExt_FClamp = 43,
+  saGLSLExt_UClamp = 44,
+  saGLSLExt_SClamp = 45,
+  saGLSLExt_FMix = 46,
+  saGLSLExt_Step = 48,
+  saGLSLExt_SmoothStep = 49,
+  saGLSLExt_Fma = 50,
+  saGLSLExt_Frexp = 51,
+  saGLSLExt_FrexpStruct = 52,
+  saGLSLExt_Ldexp = 53,
+  saGLSLExt_PackSnorm4x8 = 54,
+  saGLSLExt_PackUnorm4x8 = 55,
+  saGLSLExt_PackSnorm2x16 = 56,
+  saGLSLExt_PackUnorm2x16 = 57,
+  saGLSLExt_PackHalf2x16 = 58,
+  saGLSLExt_PackDouble2x32 = 59,
+  saGLSLExt_UnpackSnorm2x16 = 60,
+  saGLSLExt_UnpackUnorm2x16 = 61,
+  saGLSLExt_UnpackHalf2x16 = 62,
+  saGLSLExt_UnpackSnorm4x8 = 63,
+  saGLSLExt_UnpackUnorm4x8 = 64,
+  saGLSLExt_UnpackDouble2x32 = 65,
+  saGLSLExt_Length = 66,
+  saGLSLExt_Distance = 67,
+  saGLSLExt_Cross = 68,
+  saGLSLExt_Normalize = 69,
+  saGLSLExt_FaceForward = 70,
+  saGLSLExt_Reflect = 71,
+  saGLSLExt_Refract = 72,
+  saGLSLExt_FindILsb = 73,
+  saGLSLExt_FindSMsb = 74,
+  saGLSLExt_FindUMsb = 75,
+  saGLSLExt_InterpolateAtCentroid = 76,
+  saGLSLExt_InterpolateAtSample = 77,
+  saGLSLExt_InterpolateAtOffset = 78,
+  saGLSLExt_NMin = 79,
+  saGLSLExt_NMax = 80,
+  saGLSLExt_NClamp = 81
+};
+
 typedef enum sa__OpCodesCore_e {
   saOp_Nop = 0,
   saOp_Undef = 1,
@@ -1214,6 +1297,7 @@ enum sa__AssemblerLowLevelEnum {
   saAsmEnum_Scope,
   saAsmEnum_GroupOperation,
   saAsmEnum_ExecutionMode,
+  saAsmEnum_GLSLExtension,
 
   saAsmEnum_COUNT
 };
@@ -1231,30 +1315,6 @@ enum sa__AssemblySectionType_e {
   saSectionType_Functions,
   saSectionType_COUNT
 };
-
-enum sa__Tokens_e {
-  saToken_None = 0,
-  saToken_Identificator,
-  saToken_Import,
-  saToken_Module,
-  saToken_Type,
-  saToken_InputVar,
-  saToken_OutputVar,
-  saToken_UniformVar,
-  saToken_PrivateVar,
-  saToken_FunctionVar,
-
-};
-
-// TODO: Lexer for SBA
-/*typedef struct sa__token_t {
-  char tokenId[512];
-  sa_uint32_t token;
-} sa__token_t;
-
-typedef struct sa__lexer_s {
-
-} sa__lexer_t;*/
 
 typedef struct sa__spirvId_s {
   char textId[512];
@@ -1325,10 +1385,10 @@ const struct sa__assemblerLowLevelOpCodeConnection_s SA_ASSEMBLER_LOW_LEVEL_OPCO
   { "Line",                                     saOp_Line,                                      4, SA_FALSE, { SA_UINT32_MAX } },
   { "Extension",                                saOp_Extension,                                 2, SA_TRUE,  { SA_UINT32_MAX } },
   { "ExtInstImport",                            saOp_ExtInstImport,                             3, SA_TRUE,  { SA_UINT32_MAX } },
-  { "ExtInst",                                  saOp_ExtInst,                                   5, SA_TRUE,  { SA_UINT32_MAX } },
+  { "ExtInst",                                  saOp_ExtInst,                                   5, SA_TRUE,  { saAsmEnum_GLSLExtension, SA_UINT32_MAX } },
   { "MemoryModel",                              saOp_MemoryModel,                               3, SA_FALSE, { SA_UINT32_MAX } },
   { "EntryPoint",                               saOp_EntryPoint,                                4, SA_TRUE,  { saAsmEnum_EntryPoint, SA_UINT32_MAX } },
-  { "ExecutionMode",                            saOp_ExecutionMode,                             3, SA_TRUE,  { saAsmEnum_ExecutionMode, SA_UINT32_MAX /*XXX: Possibly execution mode later*/ } },
+  { "ExecutionMode",                            saOp_ExecutionMode,                             3, SA_TRUE,  { saAsmEnum_ExecutionMode, SA_UINT32_MAX } },
   { "Capability",                               saOp_Capability,                                2, SA_FALSE, { SA_UINT32_MAX } },
   { "TypeVoid",                                 saOp_TypeVoid,                                  2, SA_FALSE, { SA_UINT32_MAX } },
   { "TypeBool",                                 saOp_TypeBool,                                  2, SA_FALSE, { SA_UINT32_MAX } },
@@ -1614,7 +1674,7 @@ const struct sa__assemblerLowLevelOpCodeConnection_s SA_ASSEMBLER_LOW_LEVEL_OPCO
   { "NamedBarrierInitialize",                   saOp_NamedBarrierInitialize,                    4, SA_FALSE, { SA_UINT32_MAX } },
   { "MemoryNamedBarrier",                       saOp_MemoryNamedBarrier,                        4, SA_FALSE, { saAsmEnum_Scope, saAsmEnum_MemorySemantics, SA_UINT32_MAX } },
   { "ModuleProcessed",                          saOp_ModuleProcessed,                           2, SA_TRUE,  { SA_UINT32_MAX } },
-  { "ExecutionModeId",                          saOp_ExecutionModeId,                           5, SA_TRUE,  { SA_UINT32_MAX /*XXX: Possibly execution mode later*/} },
+  { "ExecutionModeId",                          saOp_ExecutionModeId,                           5, SA_TRUE,  { saAsmEnum_ExecutionMode, SA_UINT32_MAX } },
   { "DecorateId",                               saOp_DecorateId,                                3, SA_TRUE,  { saAsmEnum_Decoration, saAsmEnum_DecorationBuiltIn, SA_UINT32_MAX } },
   { "GroupNonUniformElect",                     saOp_GroupNonUniformElect,                      4, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
   { "GroupNonUniformAll",                       saOp_GroupNonUniformAll,                        5, SA_FALSE, { saAsmEnum_Scope, SA_UINT32_MAX } },
@@ -1656,7 +1716,7 @@ const struct sa__assemblerLowLevelOpCodeConnection_s SA_ASSEMBLER_LOW_LEVEL_OPCO
   { "PtrDiff",                                  saOp_PtrDiff,                                   5, SA_FALSE, { SA_UINT32_MAX } }
 };
 
-// Table with all keywords possible in SPA/SBA
+// Table with all keywords possible in SPA
 const struct sa__assemblerLowLevelEnumerantConnection_s SA_ASSEMBLER_LOW_LEVEL_ENUMS[saAsmEnum_COUNT][SA_MAX_ENUMERANT_ENTRIES] = {
   {
     { "Vertex", saEntryPoint_Vertex },
@@ -1665,6 +1725,7 @@ const struct sa__assemblerLowLevelEnumerantConnection_s SA_ASSEMBLER_LOW_LEVEL_E
     { "Geometry", saEntryPoint_Geometry },
     { "Fragment", saEntryPoint_Fragment },
     { "GLCompute", saEntryPoint_GLCompute },
+    { "Compute", saEntryPoint_GLCompute },
     { "Kernel", saEntryPoint_Kernel },
     { "TaskNV", saEntryPoint_TaskNV },
     { "MeshNV", saEntryPoint_MeshNV },
@@ -2151,6 +2212,89 @@ const struct sa__assemblerLowLevelEnumerantConnection_s SA_ASSEMBLER_LOW_LEVEL_E
     { "MaximumRegistersINTEL", saExecutionMode_MaximumRegistersINTEL },
     { "MaximumRegistersIdINTEL", saExecutionMode_MaximumRegistersIdINTEL },
     { "NamedMaximumRegistersINTEL", saExecutionMode_NamedMaximumRegistersINTEL },
+    { SA_NULL, SA_UINT32_MAX }
+  },
+  {
+    { "Round", saGLSLExt_Round },
+    { "RoundEven", saGLSLExt_RoundEven },
+    { "Trunc", saGLSLExt_Trunc },
+    { "FAbs", saGLSLExt_FAbs },
+    { "SAbs", saGLSLExt_SAbs },
+    { "FSign", saGLSLExt_FSign },
+    { "SSign", saGLSLExt_SSign },
+    { "Floor", saGLSLExt_Floor },
+    { "Ceil", saGLSLExt_Ceil },
+    { "Fract", saGLSLExt_Fract },
+    { "Radians", saGLSLExt_Radians },
+    { "Degrees", saGLSLExt_Degrees },
+    { "Sin", saGLSLExt_Sin },
+    { "Cos", saGLSLExt_Cos },
+    { "Tan", saGLSLExt_Tan },
+    { "Asin", saGLSLExt_Asin },
+    { "Acos", saGLSLExt_Acos },
+    { "Atan", saGLSLExt_Atan },
+    { "Sinh", saGLSLExt_Sinh },
+    { "Cosh", saGLSLExt_Cosh },
+    { "Tanh", saGLSLExt_Tanh },
+    { "Asinh", saGLSLExt_Asinh },
+    { "Acosh", saGLSLExt_Acosh },
+    { "Atanh", saGLSLExt_Atanh },
+    { "Atan2", saGLSLExt_Atan2 },
+    { "Pow", saGLSLExt_Pow },
+    { "Exp", saGLSLExt_Exp },
+    { "Log", saGLSLExt_Log },
+    { "Exp2", saGLSLExt_Exp2 },
+    { "Log2", saGLSLExt_Log2 },
+    { "Sqrt", saGLSLExt_Sqrt },
+    { "InverseSqrt", saGLSLExt_InverseSqrt },
+    { "Determinant", saGLSLExt_Determinant },
+    { "MatrixInverse", saGLSLExt_MatrixInverse },
+    { "Modf", saGLSLExt_Modf },
+    { "ModfStruct", saGLSLExt_ModfStruct },
+    { "FMin", saGLSLExt_FMin },
+    { "UMin", saGLSLExt_UMin },
+    { "SMin", saGLSLExt_SMin },
+    { "FMax", saGLSLExt_FMax },
+    { "UMax", saGLSLExt_UMax },
+    { "SMax", saGLSLExt_SMax },
+    { "FClamp", saGLSLExt_FClamp },
+    { "UClamp", saGLSLExt_UClamp },
+    { "SClamp", saGLSLExt_SClamp },
+    { "FMix", saGLSLExt_FMix },
+    { "Step", saGLSLExt_Step },
+    { "SmoothStep", saGLSLExt_SmoothStep },
+    { "Fma", saGLSLExt_Fma },
+    { "Frexp", saGLSLExt_Frexp },
+    { "FrexpStruct", saGLSLExt_FrexpStruct },
+    { "Ldexp", saGLSLExt_Ldexp },
+    { "PackSnorm4x8", saGLSLExt_PackSnorm4x8 },
+    { "PackUnorm4x8", saGLSLExt_PackUnorm4x8 },
+    { "PackSnorm2x16", saGLSLExt_PackSnorm2x16 },
+    { "PackUnorm2x16", saGLSLExt_PackUnorm2x16 },
+    { "PackHalf2x16", saGLSLExt_PackHalf2x16 },
+    { "PackDouble2x32", saGLSLExt_PackDouble2x32 },
+    { "UnpackSnorm2x16", saGLSLExt_UnpackSnorm2x16 },
+    { "UnpackUnorm2x16", saGLSLExt_UnpackUnorm2x16 },
+    { "UnpackHalf2x16", saGLSLExt_UnpackHalf2x16 },
+    { "UnpackSnorm4x8", saGLSLExt_UnpackSnorm4x8 },
+    { "UnpackUnorm4x8", saGLSLExt_UnpackUnorm4x8 },
+    { "UnpackDouble2x32", saGLSLExt_UnpackDouble2x32 },
+    { "Length", saGLSLExt_Length },
+    { "Distance", saGLSLExt_Distance },
+    { "Cross", saGLSLExt_Cross },
+    { "Normalize", saGLSLExt_Normalize },
+    { "FaceForward", saGLSLExt_FaceForward },
+    { "Reflect", saGLSLExt_Reflect },
+    { "Refract", saGLSLExt_Refract },
+    { "FindILsb", saGLSLExt_FindILsb },
+    { "FindSMsb", saGLSLExt_FindSMsb },
+    { "FindUMsb", saGLSLExt_FindUMsb },
+    { "InterpolateAtCentroid", saGLSLExt_InterpolateAtCentroid },
+    { "InterpolateAtSample", saGLSLExt_InterpolateAtSample },
+    { "InterpolateAtOffset", saGLSLExt_InterpolateAtOffset },
+    { "NMin", saGLSLExt_NMin },
+    { "NMax", saGLSLExt_NMax },
+    { "NClamp", saGLSLExt_NClamp },
     { SA_NULL, SA_UINT32_MAX }
   }
 };
@@ -2652,8 +2796,8 @@ static char* sa__intToString(sa_int32_t value) {
 
   for(sa_uint32_t i = 0; i < numCounter / 2; i++) {
     char tmp = str[i];
-    str[i] = str[numCounter - i];
-    str[numCounter - i] = tmp;
+    str[i] = str[(numCounter - 1) - i];
+    str[(numCounter - 1) - i] = tmp;
   }
 
   if(value < 0)
@@ -2686,8 +2830,9 @@ static char* sa__hexToString(sa_uint32_t value) {
 
 static char* sa__floatToString(float value, int decimals) {
   // buffer large enough for sign + int + dot + frac + null
-  static char buf[64];  
+  static char buf[64] = {0};  
   char* p = buf;
+  sa__setMemory(buf, 0, 32 * sizeof(char));
 
   // handle sign
   if (value < 0) {
@@ -2700,7 +2845,7 @@ static char* sa__floatToString(float value, int decimals) {
   float frac_part = value - (float)int_part;
 
   // write integer digits (reverse first)
-  char intbuf[32];
+  char intbuf[32] = {0};
   char* ip = intbuf;
   if (int_part == 0)
     *ip++ = '0';
@@ -2729,6 +2874,17 @@ static char* sa__floatToString(float value, int decimals) {
 
   *p = '\0';
   return buf;
+}
+
+static void sa__clearErrorMessages() {
+  for(sa_uint32_t i = 0; i < __gAssemblerErrorMessages.messagesAmount; i++) {
+    sa_free(__gAssemblerErrorMessages.pMessages[i]);
+    __gAssemblerErrorMessages.pMessages[i] = SA_NULL;
+  }
+
+  sa_free(__gAssemblerErrorMessages.pMessages);
+  __gAssemblerErrorMessages.pMessages = SA_NULL;
+  __gAssemblerErrorMessages.messagesAmount = 0;
 }
 
 static void sa__errMsg(const char* fmt, ...) {
@@ -2826,6 +2982,10 @@ static void sa__errMsg(const char* fmt, ...) {
     __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - 1] = fmt[i];
   }
 
+  msgSize++;
+  __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
+  __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - 1] = 0;
+
   va_end(args);
 }
 
@@ -2902,6 +3062,11 @@ static sa_uint32_t sa__getOperandSectionType(sa_uint16_t op) {
   case saOp_Undef:
   case saOp_Line:
   case saOp_Constant:
+  case saOp_ConstantFalse:
+  case saOp_ConstantTrue:
+  case saOp_ConstantNull:
+  case saOp_ConstantSampler:
+  case saOp_ConstantPipeStorage:
   case saOp_ConstantComposite:
     return saSectionType_Types;
   }
@@ -3081,10 +3246,6 @@ static sa_uint32_t sa__getLowLevelInstructionEnum(sa_uint32_t instructionIndex, 
 static sa_uint32_t sa__parserLowLevelSkipComment(const char * const spirvAssemblyStrStart) {
   char* p = (char*)spirvAssemblyStrStart;
 
-  // Skip all white chars at the beginning as they are valid 
-  while(sa__isShortWhite(*p))
-    p++;
-
   // If after skipping all the white spaces p == NL, return it as a just an empty line
   if(*p == '\n' /*|| *p == '\r'*/) {
     //if(*p == '\r')
@@ -3097,7 +3258,7 @@ static sa_uint32_t sa__parserLowLevelSkipComment(const char * const spirvAssembl
 
   if(*p == ';') {
     // Skip comment (full line)
-    while(*p != '\n' && *p)
+    while(*p != '\n' && *p != '\0')
       p++;
 
     if(*p == 0)
@@ -3145,6 +3306,10 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
 
   char* p = (char*)spirvAssemblyStrStart;
 
+  // Skip all white chars at the beginning as they are valid 
+  while(sa__isShortWhite(*p))
+    p++;
+
   sa_uint32_t skipCommentSize = sa__parserLowLevelSkipComment(p);
 
   if(skipCommentSize != SA_UINT32_MAX)
@@ -3159,7 +3324,8 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
 
   char* mnemonicEnd = p;
   char mnemonic[256] = {0};
-
+  
+  sa__setMemory(mnemonic, 0, sizeof(mnemonic));
   // Copy read mnemonic to temp mnemonic buffer
   sa__copyMemory(mnemonicStart, mnemonic, mnemonicEnd - mnemonicStart);
 
@@ -3307,6 +3473,33 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
 
       words[wordsSize - 1] = SA_CONVERT(enumerant);
 
+      if(operand == saOp_EntryPoint) {
+        sa_uint32_t capability = 0;
+
+        switch (enumerant) {
+        case saEntryPoint_Vertex:
+        case saEntryPoint_Fragment:
+        case saEntryPoint_GLCompute:
+          capability = saCapability_Shader;
+
+          break;
+
+        case saEntryPoint_TessellationControl:
+        case saEntryPoint_TessellationEvaluation:
+          capability = saCapability_Tesselation;
+
+          break;
+
+        case saEntryPoint_Geometry:
+          capability = saCapability_Geometry;
+          
+          break;
+        }
+
+        if(capability)
+          sa__addInstruction(&pAssembly->section[saSectionType_Capability], 2, saOp_Capability, &capability);
+      }
+
       if(enumerant == SA_UINT32_MAX) {
         sa__errMsg("Wrong enumerant for %s: %s @ line %d", sa__opcodeToString(operand), arg, line);
 
@@ -3315,8 +3508,18 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
     }
   }
   
+  sa_uint32_t operandSection = sa__getOperandSectionType(operand);
+  sa_bool canBeInsideFunction = SA_TRUE;
+
+  if(operandSection == saSectionType_Types && operand != saOp_Variable && operand != saOp_Line && operand != saOp_Undef) {
+    canBeInsideFunction = SA_FALSE;
+  }
+
+  if(canBeInsideFunction && *pInsideFn)
+    operandSection = saSectionType_Functions;
+
   // Add instruction
-  sa__addInstruction(&pAssembly->section[(*pInsideFn) == SA_TRUE ? saSectionType_Functions : sa__getOperandSectionType(operand)], wordsSize + 1, operand, words);
+  sa__addInstruction(&pAssembly->section[operandSection], wordsSize + 1, operand, words);
 
   sa_free(words);
   words = SA_NULL;
@@ -3341,6 +3544,7 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
  */
 static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAssembly) {
   sa__resetId();
+  sa__clearErrorMessages();
 
   sa_uint32_t index = 0;
 
@@ -3361,6 +3565,9 @@ static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAss
 
   strippedSpirv = (char*)sa_realloc(strippedSpirv, (strippedSpirvSize + 1) * sizeof(char));
 
+  sa_uint32_t memoryModelWords[2] = {saAddresingModel_Logical, saMemoryModel_Vulkan};
+  sa__addInstruction(&pAssembly->section[saSectionType_MemoryModel], 3, saOp_MemoryModel, memoryModelWords);
+
   while(strippedSpirv[index]) {
     sa_uint32_t next = sa__parseLowLevelInstruction(&strippedSpirv[index], pAssembly, &ids, &insideFn, line);
 
@@ -3370,9 +3577,9 @@ static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAss
       
       index++;
 
-      sa__errMsg("Something went wrong @ line %d", line);
+      //sa__errMsg("Something went wrong @ line %d", line);
 
-      return;
+      //return;
     }
 
     if(next != SA_UINT32_MAX) {
@@ -3382,7 +3589,7 @@ static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAss
     line++;
   }
 
-  pAssembly->header.bounds = ids.idCount;
+  pAssembly->header.bounds = ids.idCount + 1;
 
   for(sa_uint32_t i = 0; i < ids.idCount; i++) {
     if(ids.pIds[i].textId[0] != '%') {
@@ -3440,6 +3647,8 @@ static sa_uint8_t* sa_bakeSPIRV(const sa_assembly_t* const pAssembly, sa_uint32_
 
   sa_uint8_t* sbin = (sa_uint8_t*)sa_malloc(sizeof(sa__assemblyHeader_t));
   sa_uint32_t sbinSize = (sizeof(sa__assemblyHeader_t) / sizeof(sa_uint32_t));
+  
+  sa__clearErrorMessages();
 
   // Always converted to little endian
   sa_ptr32(sbin)[0] = SA_CONVERT(SA_SPIRV_MAGIC_NUMBER);
@@ -3469,7 +3678,6 @@ static sa_uint8_t* sa_bakeSPIRV(const sa_assembly_t* const pAssembly, sa_uint32_
   return sbin;
 }
 
-// FIXME: Disassembler must recognise sections
 /**
  * @brief disassemble SPIR-V shader
  * 
@@ -3478,6 +3686,8 @@ static sa_uint8_t* sa_bakeSPIRV(const sa_assembly_t* const pAssembly, sa_uint32_
  */
 static void sa_disassembleSPIRV(sa_assembly_t* pAsm, sa_uint8_t* shaderBin, sa_uint32_t shaderSize) {
   sa_uint32_t index = 0;
+
+  sa__clearErrorMessages();
 
   sa__setMemory(pAsm, 0, sizeof(*pAsm));
 

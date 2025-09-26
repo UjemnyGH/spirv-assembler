@@ -1,35 +1,44 @@
 module example.1
 
-glsl = import GLSL.std.450
+import %glsl GLSL.std.450
+
+entry Compute %main %inPos %outCol
+exec_mode %main LocalSize 1 1 1
 
 ; Types
-void = type VOID
-b8 = type BOOL 8
-i32 = type INT 32
-f32 = type FLOAT 32
-v4f = type VECTOR f32 4
-mat4 = type MATRIX v4f 4 
+void %void
+bool %b8 8
+int %i32 32
+uint %u32 32
+float %f32 32
+vector %v4f %f32 4
+matrix %mat4 %v4f 4 
 ; depth = 0, arrayed = 0, ms = 0, sampler 1, format = RGBA8SNORM
-imagef = type IMAGE f32 2D D0 A0 MS0 S1 RGBA8SNORM
-sampled = type SAMPLED_IMAGE imagef
+image %imagef %f32 2D D0 A0 MS0 S1 RGBA8SNORM
+sampled_image %sampled %imagef
+
+struct %someStruct {
+  %v4f %member1
+  %f32 %member2
+}
 
 ; Variables
-texture = uniform sampled
-inPos  = input v4f
-outCol = output v4f
-variable = var v4f
+uniform %texture %sampled
+input %inPos %v4f
+output %outCol %v4f
+var %variable %v4f
 
-decorate inPos L0
-decorate outCol L1
+decorate %inPos Location 0
+decorate %outCol Location 1
 
-test = fn v4f(someParameter v4f)
+fn %test %v4f(someParameter %v4f)
 ; Function
 endfn
 
 ; Main function, no params here so no need for '()'
-main = fn void
-  outCol = inPos
+fn %main %void
+  %outCol = %inPos
   @test()
-  @glsl.Normalize(inPos)
+  @glsl.Normalize(%inPos)
   ret
 endfn
