@@ -1,3 +1,9 @@
+; -------------------------------------------
+; This is only the example of syntax in SPA
+; This shader is not functional
+; Comments cannot have charsacters before ';'
+; -------------------------------------------
+
 ExtInstImport %glsl "GLSL.std.450"
 
 EntryPoint GLCompute %main "main"

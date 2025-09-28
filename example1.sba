@@ -1,6 +1,6 @@
-module example.1
+module example1
 
-import %glsl GLSL.std.450
+import %glsl GLSLstd450
 
 entry Compute %main %inPos %outCol
 exec_mode %main LocalSize 1 1 1
@@ -27,6 +27,7 @@ uniform %texture %sampled
 input %inPos %v4f
 output %outCol %v4f
 var %variable %v4f
+var %array %f32[3]
 
 decorate %inPos Location 0
 decorate %outCol Location 1
@@ -36,7 +37,7 @@ fn %test %v4f(someParameter %v4f)
 endfn
 
 ; Main function, no params here so no need for '()'
-fn %main %void
+fn %main %void()
   %outCol = %inPos
   @test()
   @glsl.Normalize(%inPos)

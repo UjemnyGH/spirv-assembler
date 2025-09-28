@@ -3108,6 +3108,15 @@ static sa_bool sa__spirvIdExist(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
   return SA_FALSE;
 }
 
+static sa_bool sa__spirvIdNameExist(sa__spirvIdTable_t* pIds, const char* name) {
+   for(sa_uint32_t i = 0; i < pIds->idCount; i++) {
+    if(sa__compareString(pIds->pIds[i].textId, name) == 0)
+      return SA_TRUE;
+  }
+
+  return SA_FALSE;
+}
+
 static void sa__createJustId(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
   if(sa__spirvIdExist(pIds, id))
     return;
@@ -3542,7 +3551,7 @@ static sa_uint32_t sa__parseLowLevelInstruction(const char * const spirvAssembly
  * @param pCodeSizeOut assembled code size
  * @return sa_uint32_t* Assembled code
  */
-static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAssembly) {
+static void sa_assembleSPIRV(const char* spirvBasicAssembly, sa_assembly_t* pAssembly) {  
   sa__resetId();
   sa__clearErrorMessages();
 
