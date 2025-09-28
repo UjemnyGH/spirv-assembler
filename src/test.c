@@ -1,6 +1,5 @@
 // For tests
-//#include "test_spirvsba.h"
-#include "spirva.h"
+#include "test_spirvsba.h"
 #include <stdio.h>
 
 static void printAssembly(sa_assembly_t* pAsm) {
