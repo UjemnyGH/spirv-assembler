@@ -251,7 +251,7 @@ static void sa_lexSPIRV(const char* spirvBasicAssembly, sa_lexer_t* pLexerData) 
         start++;
     }
     // Skip comment
-    else if(*p == ';') {
+    else if(*p == '#') {
       while(*p != '\n')
         p++;
       p++;
@@ -270,7 +270,6 @@ static void sa_lexSPIRV(const char* spirvBasicAssembly, sa_lexer_t* pLexerData) 
 }
 
 /*
-  saToken_Entry,
   saToken_Execmode,
   saToken_Uniform,
   saToken_Input,
@@ -308,11 +307,11 @@ static sa_uint32_t* sa__sbaMakeStringIntoWords(const char* str, sa_uint32_t* pOu
 }
 
 static void sa__sbaAddDebugVoidType(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds) {
-  if(!sa__spirvIdNameExist(pIds, SA_SBA_DEBUG_VOIDT)) {
-    sa_uint32_t id = sa__getOrCreateSpirvId(pIds, SA_SBA_DEBUG_VOIDT);
+  if(sa__spirvIdNameExist(pIds, SA_SBA_DEBUG_VOIDT))
+    return;
 
-    sa__addInstruction(&pAssembly->section[saSectionType_Types], 2, saOp_TypeVoid, &id);
-  }
+  sa_uint32_t id = sa__getOrCreateSpirvId(pIds, SA_SBA_DEBUG_VOIDT);
+  sa__addInstruction(&pAssembly->section[saSectionType_Types], 2, saOp_TypeVoid, &id);
 }
 
 static void sa__sbaAddName(sa_assembly_t* pAssembly, const char* name, sa_uint32_t id) {
@@ -332,111 +331,184 @@ static void sa__sbaAddName(sa_assembly_t* pAssembly, const char* name, sa_uint32
 }
 
 static sa_uint32_t sa__sbaResolveModule(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa__token_t* pStartingToken) {
-  if(pStartingToken[0].token == saToken_Module) {
-    if(pStartingToken[1].token == saToken_Identifier) {
-      // Add debug void type
-      sa__sbaAddDebugVoidType(pAssembly, pIds);
+  if(pStartingToken[0].token == saToken_Module)
+    return 0;
 
-      // Get id for that debug void
-      sa_uint32_t id = sa__getOrCreateSpirvId(pIds, SA_SBA_DEBUG_VOIDT);
+  if(pStartingToken[1].token == saToken_Identifier) {
+    sa__errMsg("Module needs identifier, found %s", pStartingToken[1].tokenId);
 
-      // Make full module token name 
-      const sa_uint32_t fullTokenSize = sa__lengthString(pStartingToken[1].tokenId) + sa__lengthString(SA_SBA_MODULE_NAME_PREFIX) + 1;
-      char* fullToken = (char*)sa_calloc(fullTokenSize, sizeof(char));
-      sa__copyMemory(SA_SBA_MODULE_NAME_PREFIX, &fullToken[0], sa__lengthString(SA_SBA_MODULE_NAME_PREFIX));
-      sa__copyMemory(pStartingToken[1].tokenId, &fullToken[sa__lengthString(SA_SBA_MODULE_NAME_PREFIX)], sa__lengthString(pStartingToken[1].tokenId));
-
-      sa__sbaAddName(pAssembly, fullToken, id);
-      
-      sa_free(fullToken);
-
-      return 2;
-    }
-    else {
-      sa__errMsg("Module needs identifier, found %s", pStartingToken[1].tokenId);
-    }
+    return 0;
   }
 
-  return 0;
+  // Add debug void type
+  sa__sbaAddDebugVoidType(pAssembly, pIds);
+
+  // Get id for that debug void
+  sa_uint32_t id = sa__getOrCreateSpirvId(pIds, SA_SBA_DEBUG_VOIDT);
+
+  // Make full module token name 
+  const sa_uint32_t fullTokenSize = sa__lengthString(pStartingToken[1].tokenId) + sa__lengthString(SA_SBA_MODULE_NAME_PREFIX) + 1;
+  char* fullToken = (char*)sa_calloc(fullTokenSize, sizeof(char));
+  sa__copyMemory(SA_SBA_MODULE_NAME_PREFIX, &fullToken[0], sa__lengthString(SA_SBA_MODULE_NAME_PREFIX));
+  sa__copyMemory(pStartingToken[1].tokenId, &fullToken[sa__lengthString(SA_SBA_MODULE_NAME_PREFIX)], sa__lengthString(pStartingToken[1].tokenId));
+
+  sa__sbaAddName(pAssembly, fullToken, id);
+  
+  sa_free(fullToken);
+
+  if(pStartingToken[2].token != saToken_Punctuator && pStartingToken[2].tokenId[0] != ';') {
+    sa__errMsg("You forgot semicolon (;) at the end of module %s", pStartingToken[1].tokenId);
+
+    return 2;
+  }
+
+  return 3;
 }
 
 static sa_uint32_t sa__sbaResolveImport(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa__token_t* pStartingToken) {
-  if(pStartingToken[0].token == saToken_Import) {
-    if(pStartingToken[1].token == saToken_Identifier && pStartingToken[2].token == saToken_Identifier) {
-      sa_uint32_t id = sa__getOrCreateSpirvId(pIds, &pStartingToken[1].tokenId[1]);
-      sa__sbaAddName(pAssembly, &pStartingToken[1].tokenId[1], id);
+  if(pStartingToken[0].token != saToken_Import)
+    return 0;
 
-      if(sa__compareString(SA_SBA_SPECIAL_IMPORT, pStartingToken[2].tokenId) == 0) {
-        sa_uint32_t nameWordsSize = 0;
-        sa_uint32_t* nameWords = sa__sbaMakeStringIntoWords("GLSL.std.450", sa__lengthString("GLSL.std.450"), &nameWordsSize);
+  if(pStartingToken[1].token != saToken_Identifier || pStartingToken[2].token != saToken_Identifier) {
+    sa__errMsg("Values after import must be identifiers");
 
-        // Alloc memory for all the words needed
-        sa_uint32_t* words = (sa_uint32_t*)sa_calloc(nameWordsSize + 1, sizeof(sa_uint32_t));
-        words[0] = id;
-        sa__copyMemory(nameWords, &words[1], nameWordsSize * sizeof(sa_uint32_t));
-
-        sa__addInstruction(&pAssembly->section[saSectionType_Extensions], nameWordsSize + 2, saOp_ExtInstImport, words);
-
-        sa_free(words);
-        sa_free(nameWords);
-
-        return 3;
-      }
-
-      // Make full import name
-      const sa_uint32_t fullTokenSize = sa__lengthString(pStartingToken[2].tokenId) + sa__lengthString(SA_SBA_IMPORT_MODULE_NAME_PREFIX) + 1;
-      char* fullToken = (char*)sa_calloc(fullTokenSize, sizeof(char));
-      sa__copyMemory(SA_SBA_IMPORT_MODULE_NAME_PREFIX, &fullToken[0], sa__lengthString(SA_SBA_IMPORT_MODULE_NAME_PREFIX));
-      sa__copyMemory(pStartingToken[2].tokenId, &fullToken[sa__lengthString(SA_SBA_IMPORT_MODULE_NAME_PREFIX)], sa__lengthString(pStartingToken[2].tokenId));
-
-      sa__sbaAddName(pAssembly, fullToken, id);
-
-      sa_free(fullToken);
-
-      return 3;
-    }
-    else {
-      sa__errMsg("Values after import must be identifiers");
-    }
+    return 0;
   }
 
-  return 0;
+  sa_uint32_t id = sa__getOrCreateSpirvId(pIds, &pStartingToken[1].tokenId[1]);
+  sa__sbaAddName(pAssembly, &pStartingToken[1].tokenId[1], id);
+
+  if(sa__compareString(SA_SBA_SPECIAL_IMPORT, pStartingToken[2].tokenId) == 0) {
+    sa_uint32_t nameWordsSize = 0;
+    sa_uint32_t* nameWords = sa__sbaMakeStringIntoWords("GLSL.std.450", sa__lengthString("GLSL.std.450"), &nameWordsSize);
+
+    // Alloc memory for all the words needed
+    sa_uint32_t* words = (sa_uint32_t*)sa_calloc(nameWordsSize + 1, sizeof(sa_uint32_t));
+    words[0] = id;
+    sa__copyMemory(nameWords, &words[1], nameWordsSize * sizeof(sa_uint32_t));
+
+    sa__addInstruction(&pAssembly->section[saSectionType_Extensions], nameWordsSize + 2, saOp_ExtInstImport, words);
+
+    sa_free(words);
+    sa_free(nameWords);
+
+    if(pStartingToken[3].token != saToken_Punctuator && pStartingToken[3].tokenId[0] != ';') {
+      sa__errMsg("You forgot semicolon (;) at the end of import %s", pStartingToken[1].tokenId);
+      
+      return 3;
+    }
+
+    return 4;
+  }
+
+  // Make full import name
+  const sa_uint32_t fullTokenSize = sa__lengthString(pStartingToken[2].tokenId) + sa__lengthString(SA_SBA_IMPORT_MODULE_NAME_PREFIX) + 1;
+  char* fullToken = (char*)sa_calloc(fullTokenSize, sizeof(char));
+  sa__copyMemory(SA_SBA_IMPORT_MODULE_NAME_PREFIX, &fullToken[0], sa__lengthString(SA_SBA_IMPORT_MODULE_NAME_PREFIX));
+  sa__copyMemory(pStartingToken[2].tokenId, &fullToken[sa__lengthString(SA_SBA_IMPORT_MODULE_NAME_PREFIX)], sa__lengthString(pStartingToken[2].tokenId));
+
+  sa__sbaAddName(pAssembly, fullToken, id);
+
+  sa_free(fullToken);
+
+  if(pStartingToken[3].token != saToken_Punctuator && pStartingToken[3].tokenId[0] != ';') {
+    sa__errMsg("You forgot semicolon (;) at the end of import %s", pStartingToken[1].tokenId);
+    
+    return 3;
+  }
+
+  return 4;
 }
 
 static sa_uint32_t sa__sbaResolveEntryPoint(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa__token_t* pStartingToken) {
   // Check for entry
-  if(pStartingToken[0].token == saToken_Entry) {
-    sa_uint32_t entryPointSize = 1;
-    sa_uint32_t* words = (sa_uint32_t*)sa_calloc(entryPointSize, sizeof(sa_uint32_t));
-    
-    // Check for token validity
-    words[0] = sa__getLowLevelInstructionEnum(saOp_EntryPoint, pStartingToken[1].tokenId); 
+  if(pStartingToken[0].token != saToken_Entry)
+    return 0;
 
-    if(words[0] != SA_UINT32_MAX && &pStartingToken[2] && pStartingToken[2].token == saToken_Identifier) {
-      entryPointSize++;
-      words = (sa_uint32_t*)sa_realloc(words, entryPointSize * sizeof(sa_uint32_t));
-      sa_uint32_t fnId = sa__getOrCreateSpirvId(pIds, &pStartingToken[2].tokenId[1]);
-      words[1] = fnId;
+  sa_uint32_t entryPointSize = 1;
+  sa_uint32_t* words = (sa_uint32_t*)sa_calloc(entryPointSize, sizeof(sa_uint32_t));
+  
+  // Check for token validity
+  words[0] = sa__getLowLevelInstructionEnum(saOp_EntryPoint, pStartingToken[1].tokenId); 
 
-      sa__sbaAddName(pAssembly, &pStartingToken[2].tokenId[1], fnId);
+  sa_uint32_t capability = 0;
 
-      sa_uint32_t entryNameWordsSize = 0;
-      sa_uint32_t* entryNameWords = sa__sbaMakeStringIntoWords(&pStartingToken[2].tokenId[1], &entryNameWordsSize);
+  // Add capability according to shader type
+  switch (words[0]) {
+  case saEntryPoint_Vertex:
+  case saEntryPoint_Fragment:
+  case saEntryPoint_GLCompute:
+    capability = saCapability_Shader;
+    break;
 
-      // TODO: Finish
+  case saEntryPoint_TessellationControl:
+  case saEntryPoint_TessellationEvaluation:
+    capability = saCapability_Tesselation;
+    break;
 
-      while(pStartingToken[1].token == saToken_Identifier) {
-        words = (sa_uint32_t)
-
-        entryPointSize++;
-      }
-    }
-    else {
-      sa__errMsg("Invalid shader type at entry: %s", pStartingToken[1].tokenId);
-    }
+  case saEntryPoint_Geometry:
+    capability = saCapability_Geometry;
+    break;
   }
 
-  return 0;
+  sa__addInstruction(&pAssembly->section[saSectionType_Capability], 2, saOp_Capability, &capability);
+
+  if(words[0] == SA_UINT32_MAX || pStartingToken[2].token != saToken_Identifier) {
+    sa__errMsg("Invalid shader type at entry: %s", pStartingToken[1].tokenId);
+
+    return 0;
+  }
+
+  entryPointSize++;
+  words = (sa_uint32_t*)sa_realloc(words, entryPointSize * sizeof(sa_uint32_t));
+  sa_uint32_t fnId = sa__getOrCreateSpirvId(pIds, &pStartingToken[2].tokenId[1]);
+  words[1] = fnId;
+
+  sa__sbaAddName(pAssembly, &pStartingToken[2].tokenId[1], fnId);
+
+  sa_uint32_t entryNameWordsSize = 0;
+  sa_uint32_t* entryNameWords = sa__sbaMakeStringIntoWords(&pStartingToken[2].tokenId[1], &entryNameWordsSize);
+  entryPointSize += entryNameWordsSize;
+
+  words = (sa_uint32_t*)sa_realloc(words, entryPointSize * sizeof(sa_uint32_t));
+  sa__copyMemory(entryNameWords, &words[2], entryNameWordsSize);
+  
+  sa_uint32_t tokenCounter = 3;
+  while(pStartingToken[tokenCounter].token == saToken_Identifier) {
+    entryPointSize++;
+    words = (sa_uint32_t*)sa_realloc(words, entryPointSize * sizeof(sa_uint32_t));
+    sa_uint32_t argId = sa__getOrCreateSpirvId(pIds, &pStartingToken[tokenCounter].tokenId[1]);
+    
+    words[entryPointSize - 1] = argId;
+
+    tokenCounter++;
+  }
+
+  sa__addInstruction(&pAssembly->section[saSectionType_EntryPoints], entryPointSize + 1, saOp_EntryPoint, words);
+
+  sa_free(words);
+
+  if(pStartingToken[tokenCounter].token != saToken_Punctuator && pStartingToken[tokenCounter].tokenId[0] != ';') {
+    sa__errMsg("You forgot semicolon (;) at the end of entrypoint %s %s", pStartingToken[1].tokenId, pStartingToken[2].tokenId);
+    
+    return tokenCounter;
+  }
+
+  // Apply correction for semicolon
+  return tokenCounter + 1;
+}
+
+static sa_uint32_t sa__sbaResolveExecutionMode(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa__token_t* pStartingToken) {
+  if(pStartingToken[0].token != saToken_Execmode)
+    return 0;
+
+  if(pStartingToken[1].token != saToken_Identifier) {
+    sa__errMsg("Value after exec_mode must be identifier: %s", pStartingToken[1].tokenId);
+
+    return 0;
+  }
+
+  
 }
 
 static void sa_assembleSBA(const char* sbaSource, sa_assembly_t* pAssembly) {

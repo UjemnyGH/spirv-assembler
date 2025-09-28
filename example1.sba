@@ -1,45 +1,45 @@
-module example1
+module example1;
 
-import %glsl GLSLstd450
+import %glsl GLSLstd450;
 
-entry Compute %main %inPos %outCol
-exec_mode %main LocalSize 1 1 1
+entry Compute %main %inPos %outCol;
+exec_mode %main LocalSize 1 1 1;
 
-; Types
-void %void
-bool %b8 8
-int %i32 32
-uint %u32 32
-float %f32 32
-vector %v4f %f32 4
-matrix %mat4 %v4f 4 
-; depth = 0, arrayed = 0, ms = 0, sampler 1, format = RGBA8SNORM
-image %imagef %f32 2D D0 A0 MS0 S1 RGBA8SNORM
-sampled_image %sampled %imagef
+# Types
+void %void;
+bool %b8 8;
+int %i32 32;
+uint %u32 32;
+float %f32 32;
+vector %v4f %f32 4;
+matrix %mat4 %v4f 4;
+# depth = 0, arrayed = 0, ms = 0, sampler 1, format = RGBA8SNORM
+image %imagef %f32 2D D0 A0 MS0 S1 RGBA8SNORM;
+sampled_image %sampled %imagef;
 
 struct %someStruct {
-  %v4f %member1
-  %f32 %member2
-}
+  %v4f %member1;
+  %f32 %member2;
+};
 
-; Variables
-uniform %texture %sampled
-input %inPos %v4f
-output %outCol %v4f
-var %variable %v4f
-var %array %f32[3]
+# Variables
+uniform %texture %sampled;
+input %inPos %v4f;
+output %outCol %v4f;
+var %variable %v4f;
+var %array %f32[3];
 
-decorate %inPos Location 0
-decorate %outCol Location 1
+decorate %inPos Location 0;
+decorate %outCol Location 1;
 
 fn %test %v4f(someParameter %v4f)
-; Function
+# Function
 endfn
 
-; Main function, no params here so no need for '()'
+# Main function, no params here so no need for '()'
 fn %main %void()
-  %outCol = %inPos
-  @test()
-  @glsl.Normalize(%inPos)
-  ret
+  %outCol = %inPos;
+  @test();
+  @glsl.Normalize(%inPos);
+  ret;
 endfn
