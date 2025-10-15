@@ -2888,8 +2888,6 @@ static void sa__clearErrorMessages() {
 }
 
 static void sa__errMsg(const char* fmt, ...) {
-  printf("%\n", fmt);
-
   sa_uint32_t count = 0;
 
   for(sa_uint32_t i = 0; i < sa__lengthString(fmt); i++) {

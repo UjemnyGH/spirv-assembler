@@ -98,7 +98,7 @@ const sa__lexerKeywordConnection_t __gsaSBAKeywords[] = {
 };
 
 const char __gsaSBAOperators[] = "+-*/=%^&|!~";
-const char __gsaSBAPunctuators[] = "[]{}(),.:";
+const char __gsaSBAPunctuators[] = "[]{}(),.:;";
 
 static void sa__lexerAddToken(sa_lexer_t* pLexer, sa__TokenType_t token, const char* text, sa_uint32_t textSize) {
   pLexer->tokenCount++;  
@@ -317,7 +317,7 @@ static void sa__sbaAddDebugVoidType(sa_assembly_t* pAssembly, sa__spirvIdTable_t
 static void sa__sbaAddName(sa_assembly_t* pAssembly, const char* name, sa_uint32_t id) {
   // Make that full token name into uint32
   sa_uint32_t nameWordsSize = 0;
-  sa_uint32_t* nameWords = sa__sbaMakeStringIntoWords(name, sa__lengthString(name), &nameWordsSize);
+  sa_uint32_t* nameWords = sa__sbaMakeStringIntoWords(name, &nameWordsSize);
 
   // Alloc memory for all the words needed
   sa_uint32_t* words = (sa_uint32_t*)sa_calloc(nameWordsSize + 1, sizeof(sa_uint32_t));
@@ -329,6 +329,10 @@ static void sa__sbaAddName(sa_assembly_t* pAssembly, const char* name, sa_uint32
   sa_free(nameWords);
   sa_free(words);
 }
+
+//
+// SBA resolvers
+//
 
 static sa_uint32_t sa__sbaResolveModule(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa__token_t* pStartingToken) {
   if(pStartingToken[0].token == saToken_Module)
@@ -380,7 +384,7 @@ static sa_uint32_t sa__sbaResolveImport(sa_assembly_t* pAssembly, sa__spirvIdTab
 
   if(sa__compareString(SA_SBA_SPECIAL_IMPORT, pStartingToken[2].tokenId) == 0) {
     sa_uint32_t nameWordsSize = 0;
-    sa_uint32_t* nameWords = sa__sbaMakeStringIntoWords("GLSL.std.450", sa__lengthString("GLSL.std.450"), &nameWordsSize);
+    sa_uint32_t* nameWords = sa__sbaMakeStringIntoWords("GLSL.std.450", &nameWordsSize);
 
     // Alloc memory for all the words needed
     sa_uint32_t* words = (sa_uint32_t*)sa_calloc(nameWordsSize + 1, sizeof(sa_uint32_t));
@@ -507,7 +511,7 @@ static sa_uint32_t sa__sbaResolveExecutionMode(sa_assembly_t* pAssembly, sa__spi
 
     return 0;
   }
-
+  
   
 }
 
