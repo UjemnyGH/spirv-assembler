@@ -178,7 +178,20 @@ static void sa__lexerAddAnything(sa_lexer_t* pLexerData, const char* start, cons
   // This function adds anything, not nothing, skip
   if(current - start < 1)
     return;
-  
+ 
+  if(current - start == 1) {
+    if(sa__lexerCheckPunctuator(start[0])) {
+      sa__lexerAddPunctuator(pLexerData, start[0]);
+
+      return;
+    }
+    else if(sa__lexerCheckOperator(start[0])) {
+      sa__lexerAddOperator(pLexerData, start[0]);
+      
+      return;
+    }
+  }
+
   char* textPart = (char*)sa_calloc(current - start + 1, sizeof(char));
   sa__copyMemory(start, textPart, current - start);
 
@@ -187,7 +200,7 @@ static void sa__lexerAddAnything(sa_lexer_t* pLexerData, const char* start, cons
   if(keyword != SA_UINT32_MAX)
     sa__lexerAddKeyword(pLexerData, (sa__TokenType_t)keyword, textPart, current - start + 1);
   else if(sa__lexerCheckLiteral(textPart, current - start))
-    sa__lexerAddLiteral(pLexerData, textPart, current - start + 1);
+    sa__lexerAddLiteral(pLexerData, textPart, current - start + 1); 
   else
     sa__lexerAddIdentifier(pLexerData, textPart, current - start + 1);
   
@@ -204,9 +217,13 @@ static void sa_lexSPIRV(const char* spirvBasicAssembly, sa_lexer_t* pLexerData) 
   pLexerData->pTokens = SA_NULL;
 
   for(sa_uint32_t i = 0; i < sbaSize; i++) {
-    if(spirvBasicAssembly[i] != '\r') {
+    if(spirvBasicAssembly[i] != '\r' && spirvBasicAssembly[i] != '#') {
       strippedSBA[strippedSBASize] = spirvBasicAssembly[i];
       strippedSBASize++;
+    }
+    else if(spirvBasicAssembly[i] == '#') {
+      while(spirvBasicAssembly[i] != '\n')
+        i++;
     }
   }
 
@@ -223,8 +240,10 @@ static void sa_lexSPIRV(const char* spirvBasicAssembly, sa_lexer_t* pLexerData) 
       p++;
       start = p;
 
-      while(*start == ' ' || *start == '\t' || *start == '\n')
+      while(*start == ' ' || *start == '\t' || *start == '\n') {
         start++;
+        p++;
+      }
     }
     else if(sa__lexerCheckPunctuator(*p)) {
       char punc = *p;
@@ -235,8 +254,10 @@ static void sa_lexSPIRV(const char* spirvBasicAssembly, sa_lexer_t* pLexerData) 
       p++;
       start = p;
 
-      while(*start == ' ' || *start == '\t' || *start == '\n')
+      while(*start == ' ' || *start == '\t' || *start == '\n') {
         start++;
+        p++;
+      }
     }
     else if(sa__lexerCheckOperator(*p)) {
       char op = *p;
@@ -247,21 +268,11 @@ static void sa_lexSPIRV(const char* spirvBasicAssembly, sa_lexer_t* pLexerData) 
       p++;
       start = p;
 
-      while(*start == ' ' || *start == '\t' || *start == '\n')
+      while(*start == ' ' || *start == '\t' || *start == '\n') {
         start++;
-    }
-    // Skip comment
-    else if(*p == '#') {
-      while(*p != '\n')
         p++;
-      p++;
-      start = p;
-
-      while(*start == ' ' || *start == '\t' || *start == '\n')
-        start++;
+      }
     }
-
-    putchar(*p);
 
     p++;
   }
@@ -270,7 +281,6 @@ static void sa_lexSPIRV(const char* spirvBasicAssembly, sa_lexer_t* pLexerData) 
 }
 
 /*
-  saToken_Execmode,
   saToken_Uniform,
   saToken_Input,
   saToken_Output,
@@ -511,8 +521,94 @@ static sa_uint32_t sa__sbaResolveExecutionMode(sa_assembly_t* pAssembly, sa__spi
 
     return 0;
   }
-  
-  
+
+  if(pStartingToken[2].token != saToken_Identifier) {
+    sa__errMsg("Execution mode must be a identifier: %s", pStartingToken[2].tokenId);
+  }
+
+  sa_uint32_t instEnum = sa__getLowLevelInstructionEnum(saOp_ExecutionMode, pStartingToken[2].tokenId);
+
+  if(instEnum == SA_UINT32_MAX) {
+    sa__errMsg("Invalid instruction enumerant (%s) for execution mode instruction", pStartingToken[2].tokenId);
+
+    return 0;
+  }
+
+  sa_uint32_t instEnumIndex = 3;
+
+  sa_uint32_t* arguments = (sa_uint32_t*)sa_calloc(1, sizeof(sa_uint32_t));
+
+  while(pStartingToken[instEnumIndex].token != saToken_Punctuator && pStartingToken[instEnumIndex].tokenId[0] != ';') {
+    arguments = (sa_uint32_t*)sa_realloc(arguments, (instEnumIndex - 2) * sizeof(sa_uint32_t));
+
+    if(pStartingToken[instEnumIndex].token == saToken_Literal)
+      arguments[instEnumIndex - 3] = sa__stringToInt(pStartingToken[instEnumIndex].tokenId);
+
+    instEnumIndex++; 
+  }
+
+  sa_uint32_t* words = (sa_uint32_t*)sa_calloc(instEnumIndex - 1, sizeof(sa_uint32_t));
+
+  words[0] = sa__getOrCreateSpirvId(pIds, pStartingToken[1].tokenId);
+  words[1] = instEnum;
+  sa__copyMemory(arguments, words + 2, instEnumIndex - 2);
+
+  sa__addInstruction(&pAssembly->section[saSectionType_ExecutionModes], instEnumIndex - 1, saOp_ExecutionMode, words);
+
+  if(pStartingToken[instEnumIndex].tokenId[0] != ';')
+    return instEnumIndex;
+
+  return instEnumIndex + 1;
+}
+
+static sa_uint32_t sa__sbaResolveUniform(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa__token_t* pStartingToken) {
+  if(pStartingToken[0].token != saToken_Uniform)
+    return 0;
+
+  sa_uint32_t uniVarId = sa__getOrCreateSpirvId(pIds, pStartingToken[1].tokenId);
+
+  if(uniVarId == SA_UINT32_MAX) {
+    sa__errMsg("Cannot create name/id for uniform of name %s", pStartingToken[1].tokenId);
+
+    return 0;
+  }
+
+  sa_uint32_t uniTypeId = sa__getSpirvId(pIds, pStartingToken[2].tokenId);
+
+  if(uniTypeId == SA_UINT32_MAX) {
+    sa__errMsg("Non existing type for uniform: %s", pStartingToken[2].tokenId);
+
+    return 0;
+  }
+  // TODO: Add uni
+  //sa__addInstruction(pAssembly->section[], sa_uint16_t wordSize, sa_uint16_t op, sa_uint32_t *words);
+ 
+  // TODO: skip ';', tables
+  return 3;
+}
+
+static sa_uint32_t sa__sbaResolveInput(sa_assembly_t* pAssembly, sa__spirvIdTable_t* pIds, sa__token_t* pStartingToken) {
+  if(pStartingToken[0].token != saToken_Input)
+    return 0;
+
+  sa_uint32_t inVarId = sa__getOrCreateSpirvId(pIds, pStartingToken[1].tokenId);
+
+  if(inVarId == SA_UINT32_MAX) {
+    sa__errMsg("Cannot create name/id for input with name: %s", pStartingToken[1].tokenId); 
+
+    return 0;
+  }
+
+  sa_uint32_t inTypeId = sa__getSpirvId(pIds, pStartingToken[2].tokenId);
+
+  if(inTypeId == SA_UINT32_MAX) {
+    sa__errMsg("Non existing type for input: %s", pStartingToken[2].tokenId);
+
+    return 0;
+  }
+
+  // TODO: skip ';', tables and add instructions
+  return 3;
 }
 
 static void sa_assembleSBA(const char* sbaSource, sa_assembly_t* pAssembly) {

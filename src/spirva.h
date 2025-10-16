@@ -85,6 +85,7 @@ typedef unsigned long  sa_uint64_t;
 
 typedef sa_int8_t     sa_bool;
 
+// Conversion to pointers
 #define sa_ptr8(x) ((sa_uint8_t*)x)
 #define sa_ptr16(x) ((sa_uint16_t*)x)
 #define sa_ptr32(x) ((sa_uint32_t*)x)
@@ -2664,6 +2665,10 @@ static const char* sa__sectionToString(sa_uint32_t section) {
   return "";
 }
 
+//
+// Utility functions
+//
+
 /**
  * @brief Short whites are spaces or tabs
  * 
@@ -2814,7 +2819,7 @@ static char* sa__hexToString(sa_uint32_t value) {
   sa_uint32_t numCounter = 0;
 
   while(num) {
-    str[numCounter] = (num & 0xF < 0xA ? '0' + num : 'A' + (num - 0xA));
+    str[numCounter] = ((num & 0xF) < 0xA ? '0' + num : 'A' + (num - 0xA));
     numCounter++;
     num >>= 4;
   }
@@ -2876,6 +2881,10 @@ static char* sa__floatToString(float value, int decimals) {
   return buf;
 }
 
+//
+// Error handling
+//
+
 static void sa__clearErrorMessages() {
   for(sa_uint32_t i = 0; i < __gAssemblerErrorMessages.messagesAmount; i++) {
     sa_free(__gAssemblerErrorMessages.pMessages[i]);
@@ -2911,14 +2920,15 @@ static void sa__errMsg(const char* fmt, ...) {
 
       switch(fmt[i + 1]) {
       // Char
-      case 'c':
+      case 'c': {
         msgSize++;
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - 1] = va_arg(args, char);
         break;
+      }
 
       // Int
-      case 'd':
+      case 'd': {
         sa_int32_t numberInt = va_arg(args, sa_int32_t); 
         char* number = sa__intToString(numberInt);
         sa_uint32_t numLength = sa__lengthString(number);
@@ -2927,9 +2937,10 @@ static void sa__errMsg(const char* fmt, ...) {
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
         sa__copyMemory(number, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - numLength - 1], numLength);
         break;
+      }
 
       // Float
-      case 'f':
+      case 'f': {
         float fnumberFloat = va_arg(args, float);
         char* fnumber = sa__floatToString(fnumberFloat, 6);
         sa_uint32_t fnumLength = sa__lengthString(fnumber);
@@ -2938,9 +2949,10 @@ static void sa__errMsg(const char* fmt, ...) {
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
         sa__copyMemory(fnumber, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - fnumLength - 1], fnumLength);
         break;
+      }
 
       // String
-      case 's':
+      case 's': {
         char* string = va_arg(args, char*);
         sa_uint32_t length = sa__lengthString(string);
 
@@ -2948,9 +2960,10 @@ static void sa__errMsg(const char* fmt, ...) {
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
         sa__copyMemory(string, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - length - 1], length);
         break;
+      }
 
       // Hex
-      case 'x':
+      case 'x': {
         sa_uint32_t hnumberUint = va_arg(args, sa_uint32_t); 
         char* hnumber = sa__hexToString(hnumberUint);
         sa_uint32_t hnumLength = sa__lengthString(hnumber);
@@ -2959,19 +2972,23 @@ static void sa__errMsg(const char* fmt, ...) {
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
         sa__copyMemory(hnumber, &__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - hnumLength - 1], hnumLength);
         break;
+      }
 
       // The percent chacarter
-      case '%':
+      case '%': {
         msgSize++;
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1] = (char*)sa_realloc(__gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1], sizeof(char) * msgSize);
         __gAssemblerErrorMessages.pMessages[__gAssemblerErrorMessages.messagesAmount - 1][msgSize - 1] = '%';
         break;
+      }
 
-      default:
+      default: {
         break;
+      }
       }
 
       i += 2;
+      // This needs to be here
       msgSize--;
     }
 
@@ -2986,6 +3003,10 @@ static void sa__errMsg(const char* fmt, ...) {
 
   va_end(args);
 }
+
+//
+// SPIR-V ID gen
+//
 
 static sa_uint32_t sa__genId() {
   return __gIdGeneratorHoldValue++;
@@ -3132,6 +3153,15 @@ static const char* sa__getSpirvName(sa__spirvIdTable_t* pIds, sa_uint32_t id) {
   }
 
   return SA_NULL;
+}
+
+static sa_uint32_t sa__getSpirvId(sa__spirvIdTable_t* pIds, const char* name) {
+  for(sa_uint32_t i = 0; i < pIds->idCount; i++) {
+    if(sa__compareString(pIds->pIds[i].textId, name) == 0)
+      return pIds->pIds[i].binaryId;
+  }
+
+  return SA_UINT32_MAX;
 }
 
 static void sa__freeSpirvIdTable(sa__spirvIdTable_t* pIds) {
